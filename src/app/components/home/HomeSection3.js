@@ -17,19 +17,19 @@ export const HomeSection3 = () => {
             Travel API context driven AI automated integrations
           </p>
           <div className="flex flex-row h-full gap-10">
-            <p className="text-white text-xl w-1/3">
+            <p className="text-white text-xl w-full">
               Our product uses an AI model to run the integration; add your code
               base and API you wish to integrate and let us do the work.
             </p>
-            <div className="relative rounded-lg w-full h-full">
+            {/* <div className="relative rounded-lg w-full h-full">
               <Image
-                layout="fill"
+                fill
                 objectFit="cover"
                 alt="waiting"
                 className="rounded-xl"
-                src={"/Sell.webp"}
+                src={"/Speed.webp"}
               />
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="bg-gray-200 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-start text-left w-full h-full m-4">

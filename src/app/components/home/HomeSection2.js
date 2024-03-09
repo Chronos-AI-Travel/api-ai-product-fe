@@ -18,7 +18,7 @@ export const HomeSection2 = () => {
 
           <div className="relative rounded-lg w-full h-full">
             <Image
-              layout="fill"
+              fill
               objectFit="cover"
               alt="waiting"
               className="rounded-xl"
@@ -33,7 +33,7 @@ export const HomeSection2 = () => {
 
           <div className="relative rounded-lg w-full h-full">
             <Image
-              layout="fill"
+              fill
               objectFit="cover"
               alt="waiting"
               className="rounded-xl"
@@ -46,7 +46,7 @@ export const HomeSection2 = () => {
 
           <div className="relative rounded-lg w-full h-full">
             <Image
-              layout="fill"
+              fill
               objectFit="cover"
               alt="waiting"
               className="rounded-xl"
@@ -61,7 +61,7 @@ export const HomeSection2 = () => {
 
           <div className="relative rounded-lg w-full h-full">
             <Image
-              layout="fill"
+              fill
               objectFit="cover"
               alt="waiting"
               className="rounded-xl"

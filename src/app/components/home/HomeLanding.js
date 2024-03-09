@@ -10,7 +10,7 @@ export const HomeLanding = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col text-center justify-between mt-10 items-center px-10">
+    <div className=" flex flex-col text-center justify-between mt-10 items-center px-10">
       <div className="h-screen flex flex-col justify-center items-center -mt-32">
         <div className="text-teal-300 font-semibold mb-3">
           Integrate with travel APIs, without the complexity.

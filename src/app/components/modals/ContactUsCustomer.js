@@ -44,7 +44,7 @@ export const ContactUsCustomer = ({ onClose }) => {
 
   return (
     <div className="modalBackground text-black">
-      <div className="modalContainer w-2/3 md:w-1/2 lg:w-1/2">
+      <div className="modalContainer w-3/4 md:w-1/2 lg:w-1/2">
         <div className="py-2 flex justify-between flex-row">
           <p className="text-3xl">Contact Us</p>
           <FontAwesomeIcon

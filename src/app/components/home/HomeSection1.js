@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export const HomeSection1 = () => {
   return (
-    <div className="h-screen bg-white py-20 px-10 flex flex-col text-center justify-between  items-center">
+    <div className="h-full bg-white py-20 px-10 flex flex-col text-center justify-between  items-center">
       <div>
         <div className="text-sm fontlight text-gray-400 uppercase">Problem</div>
         <div className="text-4xl mb-20 fontlight text-gray-900">
@@ -20,7 +20,7 @@ export const HomeSection1 = () => {
           </p>
           <div className="relative rounded-lg w-full h-full">
             <Image
-              layout="fill"
+              fill
               objectFit="cover"
               alt="waiting"
               className="rounded-xl"
@@ -38,7 +38,7 @@ export const HomeSection1 = () => {
           </p>
           <div className="relative rounded-lg w-full h-full">
             <Image
-              layout="fill"
+              fill
               objectFit="cover"
               alt="waiting"
               className="rounded-xl"
