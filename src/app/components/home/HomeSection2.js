@@ -2,14 +2,15 @@ import Image from "next/image";
 
 export const HomeSection2 = () => {
   return (
-    <div className="h-screen bg-white py-20 px-10 flex flex-col text-center justify-between  items-center">
+    <div className="h-full bg-white py-10 px-10 flex flex-col text-center justify-between  items-center">
       <div>
         <div className="text-sm fontlight text-gray-400 uppercase">
           Benefits
         </div>
 
-        <div className="text-4xl fontlight text-gray-900">
-          Boost sales, cut costs & simplify travel
+        <div className="text-4xl mb-10 fontlight text-gray-900">
+          Imagine if you could do your yearly API integrations… in one week...
+          welcome to reality!
         </div>
       </div>
       <div className="flex items-center flex-col md:flex-row lg:flex-row w-full h-1/2">
@@ -19,7 +20,7 @@ export const HomeSection2 = () => {
           <div className="relative rounded-lg w-full h-full">
             <Image
               fill
-              style={{objectFit:"cover"}}
+              style={{ objectFit: "cover" }}
               alt="waiting"
               className="rounded-xl"
               src={"/Sell.webp"}
@@ -34,7 +35,7 @@ export const HomeSection2 = () => {
           <div className="relative rounded-lg w-full h-full">
             <Image
               fill
-              style={{objectFit:"cover"}}
+              style={{ objectFit: "cover" }}
               alt="waiting"
               className="rounded-xl"
               src={"/Speed.webp"}
@@ -47,7 +48,7 @@ export const HomeSection2 = () => {
           <div className="relative rounded-lg w-full h-full">
             <Image
               fill
-              style={{objectFit:"cover"}}
+              style={{ objectFit: "cover" }}
               alt="waiting"
               className="rounded-xl"
               src={"/Save.webp"}
@@ -62,7 +63,7 @@ export const HomeSection2 = () => {
           <div className="relative rounded-lg w-full h-full">
             <Image
               fill
-              style={{objectFit:"cover"}}
+              style={{ objectFit: "cover" }}
               alt="waiting"
               className="rounded-xl"
               src={"/Complex.webp"}

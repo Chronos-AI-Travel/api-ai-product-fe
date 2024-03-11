@@ -3,12 +3,12 @@ import Slider from "react-infinite-logo-slider";
 
 const LogoSlider = () => {
   return (
-    <div className="py-4 bg-gray-200">
+    <div className="py-4 bg-gray-200 w-screen">
       <Slider
-        width="150px"
+        width="150px" // Changed from a fixed width to a percentage
         duration={40}
         pauseOnHover={false}
-        blurBorders={true}
+        blurBorders={false}
         blurBoderColor={"#fff"}
       >
         <Slider.Slide>

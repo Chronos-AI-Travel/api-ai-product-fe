@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export const HomeSection3 = () => {
   return (
-    <div className="h-full bg-white py-20 px-10 flex flex-col text-center justify-between  items-center">
+    <div className="h-full bg-white py-10 px-10 flex flex-col text-center justify-between  items-center">
       <div>
         <div className="text-sm fontlight text-gray-400 uppercase">
           Solution

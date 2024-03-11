@@ -14,12 +14,12 @@ export const HomeSection4 = () => {
     setIsCustomerModalOpen(!isCustomerModalOpen);
   };
   return (
-    <div className="h-full bg-white py-20 px-10 flex flex-col text-center justify-between  items-center">
+    <div className="h-full bg-white py-10 px-10 flex flex-col text-center justify-between  items-center">
       <div>
         <div className="text-sm fontlight text-gray-400 uppercase">
           Interested?
         </div>
-        <div className="text-4xl mb-20 fontlight text-gray-900">
+        <div className="text-4xl mb-10 fontlight text-gray-900">
           Get in touch
         </div>
       </div>
