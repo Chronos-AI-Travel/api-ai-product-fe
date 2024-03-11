@@ -21,7 +21,7 @@ export const HomeSection1 = () => {
           <div className="relative rounded-lg w-full h-full">
             <Image
               fill
-              objectFit="cover"
+              style={{objectFit:"cover"}}
               alt="waiting"
               className="rounded-xl"
               src={"/Waiting.webp"}
@@ -39,7 +39,7 @@ export const HomeSection1 = () => {
           <div className="relative rounded-lg w-full h-full">
             <Image
               fill
-              objectFit="cover"
+              style={{objectFit:"cover"}}
               alt="waiting"
               className="rounded-xl"
               src={"/Rapid.webp"}

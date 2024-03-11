@@ -24,7 +24,7 @@ export const HomeSection3 = () => {
             {/* <div className="relative rounded-lg w-full h-full">
               <Image
                 fill
-                objectFit="cover"
+      style={{objectFit:"cover"}}
                 alt="waiting"
                 className="rounded-xl"
                 src={"/Speed.webp"}
