@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { ContactUs } from "../modals/ContactUs";
+import LogoSlider from "../LogoSlider";
 
 export const HomeLanding = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,8 +11,8 @@ export const HomeLanding = () => {
   };
 
   return (
-    <div className=" flex flex-col text-center justify-between mt-10 items-center px-10">
-      <div className="h-screen flex flex-col justify-center items-center -mt-32">
+    <div className="flex h-screen flex-col text-center justify-between mt-10 items-center px-10">
+      <div className="h-full flex flex-col justify-center items-center -mt-32">
         <div className="text-teal-300 font-semibold mb-3">
           Integrate with travel APIs, without the complexity.
         </div>
@@ -28,6 +29,7 @@ export const HomeLanding = () => {
           Contact us
         </button>
       </div>
+      <LogoSlider />
       {isModalOpen && <ContactUs onClose={toggleModal} />}{" "}
     </div>
   );
