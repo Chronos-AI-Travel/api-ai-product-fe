@@ -37,7 +37,7 @@ export default function SignUp() {
       const repos = await response.json();
       console.log("Repositories:", repos.map(repo => repo.full_name));
 
-      router.push('/signedInTemp');
+      router.push('/dashboard');
     } catch (error) {
       console.error("Error signing up with GitHub or creating user document:", error.message);
     }
