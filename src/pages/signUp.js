@@ -1,6 +1,6 @@
 import React from "react";
 import { auth, provider, db } from "../app/utils/firebaseConfig"; // Make sure to import 'db' for Firestore
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, GithubAuthProvider } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/router"; // Import useRouter
 import Image from "next/image";
@@ -10,25 +10,33 @@ export default function SignUp() {
 
   const handleSignUpWithGithub = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      // This gives you a GitHub Access Token. You can use it to access the GitHub API.
-      const credential = result.credential;
-      // const token = credential.accessToken;
+      // Request additional GitHub scopes like 'repo'
+      provider.addScope('repo');
 
-      // The signed-in user info.
+      const result = await signInWithPopup(auth, provider);
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken; // GitHub Access Token
+
       const user = result.user;
       console.log("Signed in user:", user);
 
-      // Create or update the user document in Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
-        createdAt: serverTimestamp(), 
+        createdAt: serverTimestamp(),
         email: user.email,
       });
 
       console.log("User document created in Firestore");
 
-      // Redirect to SignedIn page after successful sign-up and document creation
+      // Use the GitHub Access Token to fetch the list of repositories
+      const response = await fetch('https://api.github.com/user/repos', {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      });
+      const repos = await response.json();
+      console.log("Repositories:", repos.map(repo => repo.full_name));
+
       router.push('/signedInTemp');
     } catch (error) {
       console.error("Error signing up with GitHub or creating user document:", error.message);
