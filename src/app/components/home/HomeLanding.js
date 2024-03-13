@@ -2,12 +2,18 @@
 import React, { useState } from "react";
 import { ContactUs } from "../modals/ContactUs";
 import LogoSlider from "../LogoSlider";
+import { useRouter } from "next/navigation";
 
 export const HomeLanding = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
+  };
+
+  const startOnboarding = () => {
+    router.push("/onboarding/searchProvider");
   };
 
   return (
@@ -22,12 +28,20 @@ export const HomeLanding = () => {
           information from FlightStats, we integrate their API with your tech
           stack in 24 hours.
         </div>
-        <button
-          onClick={toggleModal}
-          className="standard-button text-black bg-teal-300"
-        >
-          Contact us
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={toggleModal}
+            className="standard-button text-teal-300 border-teal-300 border-2"
+          >
+            Contact us
+          </button>
+          <button
+            onClick={startOnboarding}
+            className="standard-button text-black bg-teal-300"
+          >
+            Add my first API
+          </button>
+        </div>
       </div>
       <LogoSlider />
       {isModalOpen && <ContactUs onClose={toggleModal} />}{" "}

@@ -24,7 +24,7 @@ export const HomeSection3 = () => {
             <div className="relative rounded-lg w-full h-40">
               <Image
                 fill
-      style={{objectFit:"cover"}}
+                style={{ objectFit: "cover" }}
                 alt="waiting"
                 className="rounded-xl"
                 src={"/Speed.webp"}
@@ -34,7 +34,7 @@ export const HomeSection3 = () => {
         </div>
         <div className="bg-gray-200 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-start text-left w-full h-full m-4">
           <p className="uppercase text-gray-500 text-xs">
-            UI builder (coming soon){" "}
+            UI builder (coming soon)
           </p>
           <div className="flex h-full gap-10">
             <p className="text-black text-xl w-full">
