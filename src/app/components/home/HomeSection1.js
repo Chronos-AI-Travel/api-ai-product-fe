@@ -18,7 +18,7 @@ export const HomeSection1 = () => {
             On average, it takes 1-2 months to integrate with a Travel API,
             that’s anywhere between £10,000 - £20,000.
           </p>
-          <div className="relative rounded-lg w-full h-full">
+          <div className="relative rounded-lg w-full h-40">
             <Image
               fill
               style={{objectFit:"cover"}}
@@ -36,7 +36,7 @@ export const HomeSection1 = () => {
             Our technology enables you to integrate with ANY travel related API
             in 24 hours, at a fraction of the cost.
           </p>
-          <div className="relative rounded-lg w-full h-full">
+          <div className="relative rounded-lg w-full h-40">
             <Image
               fill
               style={{objectFit:"cover"}}

@@ -21,7 +21,7 @@ export const HomeSection3 = () => {
               Our product uses an AI model to run the integration; add your code
               base and API you wish to integrate and let us do the work.
             </p>
-            {/* <div className="relative rounded-lg w-full h-full">
+            <div className="relative rounded-lg w-full h-40">
               <Image
                 fill
       style={{objectFit:"cover"}}
@@ -29,7 +29,7 @@ export const HomeSection3 = () => {
                 className="rounded-xl"
                 src={"/Speed.webp"}
               />
-            </div> */}
+            </div>
           </div>
         </div>
         <div className="bg-gray-200 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-start text-left w-full h-full m-4">

@@ -14,10 +14,10 @@ export const HomeSection2 = () => {
         </div>
       </div>
       <div className="flex items-center flex-col md:flex-row lg:flex-row w-full h-1/2">
-        <div className="bg-black flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-start text-left w-full h-full m-4">
+        <div className="bg-black flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-between text-left w-full h-80 m-4">
           <p className="uppercase text-gray-300 text-lg">Save time</p>
 
-          <div className="relative rounded-lg w-full h-full">
+          <div className="relative rounded-lg w-full h-40">
             <Image
               fill
               style={{ objectFit: "cover" }}
@@ -27,12 +27,12 @@ export const HomeSection2 = () => {
             />
           </div>
         </div>
-        <div className="bg-blue-300 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-start text-left w-full h-full m-4">
+        <div className="bg-blue-300 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-between text-left w-full h-80 m-4">
           <p className="uppercase text-black text-lg">
             Sell travel content faster
           </p>
 
-          <div className="relative rounded-lg w-full h-full">
+          <div className="relative rounded-lg w-full h-40">
             <Image
               fill
               style={{ objectFit: "cover" }}
@@ -42,10 +42,10 @@ export const HomeSection2 = () => {
             />
           </div>
         </div>
-        <div className="bg-gray-300 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-start text-left w-full h-full m-4">
+        <div className="bg-gray-300 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-between text-left w-full h-80 m-4">
           <p className="uppercase text-black text-lg">Reduce cost</p>
 
-          <div className="relative rounded-lg w-full h-full">
+          <div className="relative rounded-lg w-full h-40">
             <Image
               fill
               style={{ objectFit: "cover" }}
@@ -55,12 +55,12 @@ export const HomeSection2 = () => {
             />
           </div>
         </div>
-        <div className="bg-blue-500 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-start text-left w-full h-full m-4">
+        <div className="bg-blue-500 flex p-8 gap-4 rounded-2xl flex flex-col items-start justify-between text-left w-full h-80 m-4">
           <p className="uppercase text-gray-200 text-lg">
             Eliminate travel jargon & complexity
           </p>
 
-          <div className="relative rounded-lg w-full h-full">
+          <div className="relative rounded-lg w-full h-40">
             <Image
               fill
               style={{ objectFit: "cover" }}

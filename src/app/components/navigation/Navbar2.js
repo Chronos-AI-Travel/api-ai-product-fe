@@ -54,7 +54,9 @@ const Navbar2 = () => {
             </button>
           </div>
           <Image src={"/Logo.webp"} height={50} width={50} alt="logo" />
-          <button>Page 1</button>
+          <button className={`${isDashboard ? "font-bold" : ""}`}>
+            Dashboard
+          </button>
           <button>Page 2</button>
           <button>Page 3</button>
           <button onClick={handleSignOut}>Sign Out</button>
