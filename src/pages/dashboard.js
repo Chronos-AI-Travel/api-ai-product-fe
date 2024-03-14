@@ -91,7 +91,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full font-montserrat bg-slate-900 overflow-hidden">
+    <div className="flex flex-col h-screen w-full font-montserrat bg-slate-900 overflow-hidden px-4">
       <Navbar2 />
       <div className="flex flex-col items-start justify-start w-full p-4">
         {/* {userEmail && (
@@ -108,31 +108,33 @@ export default function Dashboard() {
         <div>
           <div>
             <h2 className="font-semibold my-2 text-white">Your Repositories</h2>
-            <ul
-              className="flex overflow-x-auto w-full mb-4 p-2 gap-2 rounded-lg"
-              style={{
-                scrollbarWidth: "none" /* For Firefox */,
-                "-ms-overflow-style":
-                  "none" /* For Internet Explorer and Edge */,
-                "scrollbar-width": "none" /* For modern browsers */,
-              }}
-            >
-              {repos.map((repo, index) => (
-                <li
-                  key={index}
-                  className="text-white w-40 border rounded-lg p-2 flex items-center justify-between"
-                >
-                  {repo.name}
-                  <div>
-                    <FontAwesomeIcon
-                      className="p-2 cursor-pointer hover:text-yellow-400"
-                      icon={faEye}
-                      onClick={() => handleViewRepo(repo.full_name)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="flex overflow-x-auto w-full">
+              <ul
+                className="flex overflow-x-auto w-full mb-4 p-2 gap-2 rounded-lg"
+                style={{
+                  scrollbarWidth: "none" /* For Firefox */,
+                  "-ms-overflow-style":
+                    "none" /* For Internet Explorer and Edge */,
+                  "scrollbar-width": "none" /* For modern browsers */,
+                }}
+              >
+                {repos.map((repo, index) => (
+                  <li
+                    key={index}
+                    className="text-white w-40 border rounded-lg p-2 flex items-center justify-between"
+                  >
+                    {repo.name}
+                    <div>
+                      <FontAwesomeIcon
+                        className="p-2 cursor-pointer hover:text-yellow-400"
+                        icon={faEye}
+                        onClick={() => handleViewRepo(repo.full_name)}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
           <div>
             <h2 className="font-semibold my-2 text-white">Your Projects</h2>
