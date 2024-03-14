@@ -86,12 +86,12 @@ const SearchProvider = () => {
           <input
             type="text"
             placeholder="Search for a provider..."
-            className="mt-4 w-2/3 px-4 text-gray-700 py-2 rounded focus:outline-none focus:shadow-outline"
+            className="mt-4 w-full md:w-1/2 px-4 text-gray-700 py-2 rounded focus:outline-none focus:shadow-outline"
             onChange={(e) => setSearchTerm(e.target.value)}
             onFocus={() => setSearchTerm("")}
           />
           {searchTerm && (
-            <div className="absolute top-full text-left mt-1 w-2/3 bg-white text-black rounded z-10">
+            <div className="absolute top-full text-left mt-1 w-full md:w-1/2 bg-white text-black rounded z-10">
               {filteredProviders.map((provider) => (
                 <div
                   key={provider.id}

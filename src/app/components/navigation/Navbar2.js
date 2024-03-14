@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faSignOut, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -34,10 +34,10 @@ const Navbar2 = () => {
           <button className={`${isDashboard ? "font-bold" : ""}`}>
             Dashboard
           </button>
-          <button>Page 2</button>
-          <button>Page 3</button>
+          {/* <button>Page 2</button> */}
+          {/* <button>Page 3</button> */}
           <button className="" onClick={handleSignOut}>
-            Sign Out
+            <FontAwesomeIcon icon={faSignOut}/>
           </button>
         </div>
       </div>
@@ -57,8 +57,8 @@ const Navbar2 = () => {
           <button className={`${isDashboard ? "font-bold" : ""}`}>
             Dashboard
           </button>
-          <button>Page 2</button>
-          <button>Page 3</button>
+          {/* <button>Page 2</button> */}
+          {/* <button>Page 3</button> */}
           <button onClick={handleSignOut}>Sign Out</button>
         </div>
       )}

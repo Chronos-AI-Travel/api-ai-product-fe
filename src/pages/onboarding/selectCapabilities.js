@@ -107,7 +107,7 @@ const SelectCapabilities = () => {
       <div className="h-screen w-2/3 flex items-center justify-center flex-col">
         <p className="text-3xl">Select capabilities of your integration</p>
         <div className="w-full flex items-center justify-start flex-col">
-          <ul className="mt-4 w-2/3 text-black">
+          <ul className="mt-4 w-full md:w-1/3 text-black">
             {capabilities.map((capability, index) => (
               <li
                 key={index}
