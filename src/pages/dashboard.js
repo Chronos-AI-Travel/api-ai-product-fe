@@ -91,9 +91,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col h-screen font-montserrat bg-slate-900">
+    <div className="flex flex-col h-screen w-full font-montserrat bg-slate-900 overflow-hidden">
       <Navbar2 />
-      <div className="flex flex-col items-start justify-start p-4">
+      <div className="flex flex-col items-start justify-start w-full p-4">
         {/* {userEmail && (
           <p className="text-white border rounded-lg p-2 my-4">
             Signed in as: {userEmail}
@@ -109,7 +109,7 @@ export default function Dashboard() {
           <div>
             <h2 className="font-semibold my-2 text-white">Your Repositories</h2>
             <ul
-              className="flex overflow-x-auto w-screen mb-4 p-2 gap-2 rounded-lg"
+              className="flex overflow-x-auto w-full mb-4 p-2 gap-2 rounded-lg"
               style={{
                 scrollbarWidth: "none" /* For Firefox */,
                 "-ms-overflow-style":
@@ -136,7 +136,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h2 className="font-semibold my-2 text-white">Your Projects</h2>
-            <ul className="h-1/2 flex overflow-y-auto p-2 gap-2 rounded-lg">
+            <ul className="flex overflow-x-auto w-full mb-4 p-2 gap-2 rounded-lg">
               {projects.map((project, index) => (
                 <li
                   key={index}

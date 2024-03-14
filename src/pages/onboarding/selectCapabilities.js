@@ -11,16 +11,19 @@ const SelectCapabilities = () => {
   useEffect(() => {
     const fetchProviderCapabilities = async () => {
       const providerID = localStorage.getItem("selectedProviderID");
+      console.log("Selected Provider ID:", providerID); // Log the provider ID for verification
+  
       if (!providerID) {
         console.error("No provider ID found");
         setIsLoading(false);
         return;
       }
-
+  
       const docRef = doc(db, "providers", providerID);
       try {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
+          console.log("Provider document found:", docSnap.data()); // Log the found document data
           const providerData = docSnap.data();
           const transformedCapabilities = providerData.capabilities.map(
             (name) => ({
@@ -30,7 +33,7 @@ const SelectCapabilities = () => {
           );
           setCapabilities(transformedCapabilities);
         } else {
-          console.log("No such document!");
+          console.log("No such document!"); // Log if the document does not exist
         }
       } catch (error) {
         console.error("Error fetching provider capabilities:", error);
@@ -38,7 +41,7 @@ const SelectCapabilities = () => {
         setIsLoading(false);
       }
     };
-
+  
     fetchProviderCapabilities();
   }, []);
 

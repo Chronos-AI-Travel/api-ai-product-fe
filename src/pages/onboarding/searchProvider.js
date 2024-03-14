@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import {
   collection,
   getDocs,
+  getDoc,
   query,
   orderBy,
   addDoc,
+  where,
+  doc,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../app/utils/firebaseConfig";
@@ -40,18 +43,32 @@ const SearchProvider = () => {
 
   const handleSelectProvider = async (provider) => {
     try {
-      const docRef = await addDoc(collection(db, "projects"), {
-        providerName: provider.name,
-        providerID: provider.id,
-        createdAt: serverTimestamp(),
-        status: "In progress",
-      });
-
-      localStorage.setItem("projectID", docRef.id); // Adjusted to store projectID
-
-      router.push("/onboarding/selectCapabilities");
+      const providerDocRef = doc(db, "providers", provider.id); 
+      const providerDocSnap = await getDoc(providerDocRef);
+  
+      if (providerDocSnap.exists()) {
+        const providerData = providerDocSnap.data();
+  
+        if (providerData.status) {
+          const docRef = await addDoc(collection(db, "projects"), {
+            providerName: provider.name,
+            providerID: provider.id,
+            createdAt: serverTimestamp(),
+            status: "In progress",
+          });
+  
+          localStorage.setItem("projectID", docRef.id);
+          localStorage.setItem("selectedProviderID", provider.id); // Set selectedProviderID here
+          router.push("/onboarding/selectCapabilities");
+        } else {
+          handleRequestNewProvider();
+        }
+      } else {
+        console.error("Provider document not found");
+        handleRequestNewProvider();
+      }
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error fetching provider document: ", error);
     }
   };
 
