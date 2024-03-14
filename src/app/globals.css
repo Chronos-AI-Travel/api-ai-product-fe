@@ -56,6 +56,11 @@ body {
   flex-direction: column;
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+ul::-webkit-scrollbar {
+  display: none;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

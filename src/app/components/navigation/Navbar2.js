@@ -27,7 +27,7 @@ const Navbar2 = () => {
   const isDashboard = router.pathname === "/dashboard";
 
   return (
-    <div className="h-16 py-10 flex flex-row text-sm justify-between items-center px-4">
+    <div className="h-16 py-10 flex flex-row text-sm justify-between items-center px-4 text-white">
       <Image src={"/Logo.webp"} height={50} width={50} alt="logo" />
       <div className="md:flex hidden flex-row items-center gap-8 ">
         <div className="flex flex-row gap-8 items-center ">

@@ -40,18 +40,23 @@ const SearchProvider = () => {
 
   const handleSelectProvider = async (provider) => {
     try {
-      await addDoc(collection(db, "projects"), {
+      const docRef = await addDoc(collection(db, "projects"), {
         providerName: provider.name,
         providerID: provider.id,
         createdAt: serverTimestamp(),
+        status: "In progress",
       });
-  
-      localStorage.setItem('selectedProviderID', provider.id);
-  
-      router.push('/onboarding/selectComponents');
+
+      localStorage.setItem("projectID", docRef.id); // Adjusted to store projectID
+
+      router.push("/onboarding/selectCapabilities");
     } catch (error) {
       console.error("Error adding document: ", error);
     }
+  };
+
+  const handleRequestNewProvider = () => {
+    router.push("/onboarding/providerRequest");
   };
 
   return (
@@ -79,6 +84,12 @@ const SearchProvider = () => {
                   {provider.name}
                 </div>
               ))}
+              <div
+                className="px-4 py-2 cursor-pointer hover:bg-gray-200 underline text-center"
+                onClick={handleRequestNewProvider}
+              >
+                Can&apos;t find it? Send a request.
+              </div>
             </div>
           )}
         </div>
