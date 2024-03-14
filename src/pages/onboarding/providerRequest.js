@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import FormSubmittedModal from "../../app/components/modals/FormSubmittedModal";
+import { InlineWidget } from "react-calendly";
 
 const ProviderRequest = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showCalendlyModal, setShowCalendlyModal] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
@@ -32,13 +34,18 @@ const ProviderRequest = () => {
       );
 
       if (response.ok) {
-        setShowModal(true); // Show the modal upon successful email sending
+        setShowCalendlyModal(true); // Show Calendly modal upon successful email sending
       } else {
         console.error("Failed to send provider request email");
       }
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const onCalendlyEventScheduled = () => {
+    setShowCalendlyModal(false);
+    setShowModal(true);
   };
 
   return (
@@ -101,6 +108,44 @@ const ProviderRequest = () => {
           </button>
         </form>
         {showModal && <FormSubmittedModal setShowModal={setShowModal} />}
+        {showCalendlyModal && (
+          <div
+            className="calendly-modal"
+            style={{
+              position: "fixed", // Use fixed positioning to make it float above the content
+              top: "50%", // Center vertically
+              left: "50%", // Center horizontally
+              transform: "translate(-50%, -50%)", // Adjust the transform to ensure it's centered
+              width: "100%", // Set the width to 80% of the viewport width
+              maxWidth: "600px", // Max width for larger screens
+              zIndex: 1000, // Ensure it's above other content
+              backgroundColor: "white", // Background color for the modal
+              padding: "20px", // Add some padding inside the modal
+              borderRadius: "8px", // Optional: rounded corners
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Optional: add a shadow for better visibility
+            }}
+          >
+            <InlineWidget
+              url="https://calendly.com/joshsparkes6/provider-request-meeting"
+              onEventScheduled={onCalendlyEventScheduled}
+              styles={{ height: "600px" }} // Adjust the height of the Calendly widget
+            />
+            <button
+              onClick={() => {
+                setShowCalendlyModal(false);
+                setShowModal(true); // Open the FormSubmittedModal right after closing the Calendly modal
+              }}
+              style={{
+                position: "relative", // Position the button absolutely within the modal
+                top: "10px", // Distance from the top of the modal
+                right: "10px", // Distance from the right of the modal
+              }}
+              className="text-black border-2 border-black p-2 rounded-lg"
+            >
+              Close
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
