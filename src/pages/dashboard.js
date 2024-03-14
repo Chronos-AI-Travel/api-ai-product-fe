@@ -4,9 +4,13 @@ import { auth, db } from "../app/utils/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, getDocs } from "firebase/firestore";
 import Navbar2 from "../app/components/navigation/Navbar2";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faEye } from "@fortawesome/free-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faEye } from "@fortawesome/free-solid-svg-icons";
 import RepoModal from "../app/components/modals/RepoModal";
+import ActiveProjects from "../app/components/dashboard/ActiveProjects";
+import YourNews from "../app/components/dashboard/YourNews";
+import CompletedProjects from "../app/components/dashboard/CompletedProjects";
+// import YourRepositories from "../app/components/dashboard/YourRepositories";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -58,32 +62,32 @@ export default function Dashboard() {
     return () => unsubscribe();
   }, [router]);
 
-  const handleViewRepo = async (repoFullName) => {
-    const user = auth.currentUser;
-    if (!user) {
-      console.error("User not authenticated");
-      return;
-    }
+  // const handleViewRepo = async (repoFullName) => {
+  //   const user = auth.currentUser;
+  //   if (!user) {
+  //     console.error("User not authenticated");
+  //     return;
+  //   }
 
-    const tokenDocRef = doc(db, "access_tokens", user.uid);
-    const tokenDoc = await getDoc(tokenDocRef);
-    if (!tokenDoc.exists()) {
-      console.error("No access token found for user:", user.uid);
-      return;
-    }
-    const token = tokenDoc.data().githubAccessToken;
+  //   const tokenDocRef = doc(db, "access_tokens", user.uid);
+  //   const tokenDoc = await getDoc(tokenDocRef);
+  //   if (!tokenDoc.exists()) {
+  //     console.error("No access token found for user:", user.uid);
+  //     return;
+  //   }
+  //   const token = tokenDoc.data().githubAccessToken;
 
-    const url = `https://api.github.com/repos/${repoFullName}/contents`;
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `token ${token}`,
-      },
-    });
-    const data = await response.json();
-    console.log(data);
-    setModalContent(data);
-    setIsModalOpen(true);
-  };
+  //   const url = `https://api.github.com/repos/${repoFullName}/contents`;
+  //   const response = await fetch(url, {
+  //     headers: {
+  //       Authorization: `token ${token}`,
+  //     },
+  //   });
+  //   const data = await response.json();
+  //   console.log(data);
+  //   setModalContent(data);
+  //   setIsModalOpen(true);
+  // };
 
   const handleStartNewProject = () => {
     localStorage.clear(); // Clears the local storage
@@ -91,7 +95,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full font-montserrat bg-slate-900 overflow-hidden px-4">
+    <div className="flex flex-col h-full min-h-screen w-full font-montserrat bg-slate-900 overflow-hidden px-4">
       <Navbar2 />
       <div className="flex flex-col items-start justify-start w-full p-4">
         {/* {userEmail && (
@@ -106,71 +110,10 @@ export default function Dashboard() {
           Start New Project
         </button>
         <div>
-          <div>
-            <h2 className="font-semibold my-2 text-white">Your Repositories</h2>
-            <div className="flex overflow-x-auto w-full">
-              <ul
-                className="flex overflow-x-auto w-full mb-4 p-2 gap-2 rounded-lg"
-                style={{
-                  scrollbarWidth: "none" /* For Firefox */,
-                  "-ms-overflow-style":
-                    "none" /* For Internet Explorer and Edge */,
-                  "scrollbar-width": "none" /* For modern browsers */,
-                }}
-              >
-                {repos.map((repo, index) => (
-                  <li
-                    key={index}
-                    className="text-white w-40 border rounded-lg p-2 flex items-center justify-between"
-                  >
-                    {repo.name}
-                    <div>
-                      <FontAwesomeIcon
-                        className="p-2 cursor-pointer hover:text-yellow-400"
-                        icon={faEye}
-                        onClick={() => handleViewRepo(repo.full_name)}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div>
-            <h2 className="font-semibold my-2 text-white">Your Projects</h2>
-            <ul className="flex overflow-x-auto w-full mb-4 p-2 gap-2 rounded-lg">
-              {projects.map((project, index) => (
-                <li
-                  key={index}
-                  className="text-slate-900 justify-between cursor-pointer gap-1 w-40 bg-white border rounded-lg p-2 flex flex-col"
-                >
-                  <span className="text-lg font-semibold">
-                    {project.providerName}
-                  </span>
-                  <ul>
-                    {project.capabilities.map((capability, capIndex) => (
-                      <li className="text-sm font-light" key={capIndex}>
-                        - {capability}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="text-right">
-                    <span className="text-xs font-light">
-                      {project.createdAt.toDate().toLocaleDateString()}
-                    </span>
-                    <div className="flex items-center justify-end">
-                      <span className="text-xs font-light">
-                        {project.status}
-                      </span>
-                      {project.status === "In progress" && (
-                        <span className="inline-block ml-2 w-2 h-2 bg-teal-300 rounded-full"></span>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* <YourRepositories repos={repos} handleViewRepo={handleViewRepo} /> */}
+          <ActiveProjects projects={projects} />
+          <CompletedProjects projects={projects} />
+          <YourNews />
         </div>
       </div>
       <RepoModal

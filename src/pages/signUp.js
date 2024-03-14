@@ -17,14 +17,14 @@ import Image from "next/image";
 
 export default function SignUp() {
   const router = useRouter();
-  const [checkingStatus, setCheckingStatus] = useState(true); 
+  const [checkingStatus, setCheckingStatus] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setTimeout(() => {
         setCheckingStatus(false); // Done checking status
         if (user) {
-          router.push('/dashboard');
+          router.push("/dashboard");
         }
       }, 1000); // 1000 milliseconds = 1 second
     });
@@ -87,13 +87,19 @@ export default function SignUp() {
         {checkingStatus ? (
           <p className="mt-10 text-sm text-white">Checking status...</p>
         ) : (
-          <button
-            onClick={handleSignUpWithGithub}
-            className="bg-white flex flex-row items-center justify gap-3 mt-10 standard-button text-sm text-black"
-          >
-            <Image src={"/GitHub.webp"} width={40} height={40} alt="github" />
-            Continue with GitHub
-          </button>
+          <div className="flex w-11/12 flex-col items-center justify-center">
+            <p>
+              Chronos requires access to your relevent repositories so that it
+              can process the integration effectively.
+            </p>
+            <button
+              onClick={handleSignUpWithGithub}
+              className="bg-white flex flex-row items-center justify gap-3 mt-10 standard-button text-sm text-black"
+            >
+              <Image src={"/GitHub.webp"} width={40} height={40} alt="github" />
+              Continue with GitHub
+            </button>
+          </div>
         )}
       </div>
     </div>

@@ -6,12 +6,12 @@ import {
   query,
   orderBy,
   addDoc,
-  where,
   doc,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../app/utils/firebaseConfig";
 import { useRouter } from "next/router";
+import Header from '../../app/components/home/Header'
 
 const SearchProvider = () => {
   const [providers, setProviders] = useState([]);

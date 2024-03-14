@@ -27,17 +27,20 @@ const Navbar2 = () => {
   const isDashboard = router.pathname === "/dashboard";
 
   return (
-    <div className="h-16 py-10 flex flex-row text-sm justify-between items-center px-4 text-white">
+    <div className="h-16 py-10 flex flex-row bg-slate-900 text-sm justify-between items-center px-4 text-white">
       <Image src={"/Logo.webp"} height={50} width={50} alt="logo" />
       <div className="md:flex hidden flex-row items-center gap-8 ">
         <div className="flex flex-row gap-8 items-center ">
-          <button className={`${isDashboard ? "font-bold" : ""}`}>
+        <button
+            className={`${isDashboard ? "font-bold" : ""}`}
+            onClick={() => router.push("/dashboard")}
+          >
             Dashboard
           </button>
           {/* <button>Page 2</button> */}
           {/* <button>Page 3</button> */}
           <button className="" onClick={handleSignOut}>
-            <FontAwesomeIcon icon={faSignOut}/>
+            <FontAwesomeIcon icon={faSignOut} />
           </button>
         </div>
       </div>
@@ -54,7 +57,10 @@ const Navbar2 = () => {
             </button>
           </div>
           <Image src={"/Logo.webp"} height={50} width={50} alt="logo" />
-          <button className={`${isDashboard ? "font-bold" : ""}`}>
+          <button
+            className={`${isDashboard ? "font-bold" : ""}`}
+            onClick={() => router.push("/dashboard")}
+          >
             Dashboard
           </button>
           {/* <button>Page 2</button> */}

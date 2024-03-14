@@ -3,7 +3,7 @@ import Slider from "react-infinite-logo-slider";
 
 const LogoSlider = () => {
   return (
-    <div className="py-4 bg-gray-200 w-screen">
+    <div className="py-4 bg-gray-100 w-screen">
       <Slider
         width="150px" // Assuming you want to keep this as a fixed width for the slider itself
         duration={40}
@@ -12,43 +12,63 @@ const LogoSlider = () => {
         blurBoderColor={"#fff"}
       >
         <Slider.Slide>
-          <div style={{ width: 100, height: 100, position: "relative" }}>
-            <Image src={"/Uber.webp"} fill objectFit="contain" alt="uber" />
-          </div>
-        </Slider.Slide>
-        <Slider.Slide>
-          <div style={{ width: 100, height: 100, position: "relative" }}>
+          <div>
             <Image
-              src={"/SkyScanner.webp"}
-              fill
-              objectFit="contain"
-              alt="SkyScanner"
+              src="/Uber.webp"
+              alt="Uber"
+              width={100} // Adjust the width as needed
+              height={100} // Adjust the height as needed
+              style={{ objectFit: "cover" }} // Apply object-fit directly
             />
+            {/* Repeat for other images */}
           </div>
         </Slider.Slide>
         <Slider.Slide>
-          <div style={{ width: 100, height: 100, position: "relative" }}>
+          <div>
             <Image
-              src={"/Booking.webp"}
-              fill
-              objectFit="contain"
-              alt="Booking"
+              src="/SkyScanner.webp"
+              alt="Uber"
+              width={100} // Adjust the width as needed
+              height={100} // Adjust the height as needed
+              style={{ objectFit: "cover" }} // Apply object-fit directly
             />
+            {/* Repeat for other images */}
           </div>
         </Slider.Slide>
         <Slider.Slide>
-          <div style={{ width: 100, height: 100, position: "relative" }}>
+          <div>
             <Image
-              src={"/TripAdvisor.webp"}
-              fill
-              objectFit="contain"
-              alt="TripAdvisor"
+              src="/Booking.webp"
+              alt="Uber"
+              width={100} // Adjust the width as needed
+              height={100} // Adjust the height as needed
+              style={{ objectFit: "cover" }} // Apply object-fit directly
             />
+            {/* Repeat for other images */}
           </div>
         </Slider.Slide>
         <Slider.Slide>
-          <div style={{ width: 100, height: 100, position: "relative" }}>
-            <Image src={"/Maps.webp"} fill objectFit="contain" alt="Maps" />
+          <div>
+            <Image
+              src="/TripAdvisor.webp"
+              alt="Uber"
+              width={100} // Adjust the width as needed
+              height={100} // Adjust the height as needed
+              style={{ objectFit: "cover" }} // Apply object-fit directly
+            />
+            {/* Repeat for other images */}
+          </div>
+        </Slider.Slide>
+        <Slider.Slide>
+          <div>
+            <Image
+              src="/Maps.webp"
+              alt="Uber"
+              width={100} // Adjust the width as needed
+              height={100} // Adjust the height as needed
+              style={{ objectFit: "cover" }} // Apply object-fit directly
+            />
+            {/* Repeat for other images */}
           </div>
         </Slider.Slide>
       </Slider>
