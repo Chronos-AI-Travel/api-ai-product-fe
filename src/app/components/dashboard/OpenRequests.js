@@ -40,7 +40,7 @@ const OpenRequests = ({ userUid }) => {
         {providerRequests.map((request, index) => (
           <li
             key={index}
-            className="text-slate-900 justify-between cursor-pointer gap-1 w-40 bg-white border rounded-lg p-2 flex flex-col hover:scale-105 transition-transform duration-200"
+            className="text-slate-900 justify-between cursor-pointer gap-1 w-40 bg-slate-300 border rounded-lg p-2 flex flex-col hover:scale-105 transition-transform duration-200"
             onClick={() => handleRequestClick(request)}
           >
             <span className="text-lg font-semibold">{request.apiIntegration}</span>
