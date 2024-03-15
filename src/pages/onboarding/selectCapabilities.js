@@ -7,23 +7,25 @@ const SelectCapabilities = () => {
   const [capabilities, setCapabilities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const [docsLink, setDocsLink] = useState("");
+  const [providerName, setProviderName] = useState("");
+  const [averageIntTime, setAverageIntTime] = useState("");
 
   useEffect(() => {
     const fetchProviderCapabilities = async () => {
       const providerID = localStorage.getItem("selectedProviderID");
-      console.log("Selected Provider ID:", providerID); // Log the provider ID for verification
-  
+
       if (!providerID) {
         console.error("No provider ID found");
         setIsLoading(false);
         return;
       }
-  
+
       const docRef = doc(db, "providers", providerID);
       try {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          console.log("Provider document found:", docSnap.data()); // Log the found document data
+          console.log("Provider document found:", docSnap.data());
           const providerData = docSnap.data();
           const transformedCapabilities = providerData.capabilities.map(
             (name) => ({
@@ -31,9 +33,17 @@ const SelectCapabilities = () => {
               isSelected: false,
             })
           );
-          setCapabilities(transformedCapabilities);
+          setCapabilities(
+            providerData.capabilities.map((name) => ({
+              name,
+              isSelected: false,
+            }))
+          );
+          setDocsLink(providerData.docsLink || "");
+          setProviderName(providerData.name);
+          setAverageIntTime(providerData.averageIntTime);
         } else {
-          console.log("No such document!"); // Log if the document does not exist
+          console.log("No such document!");
         }
       } catch (error) {
         console.error("Error fetching provider capabilities:", error);
@@ -41,7 +51,7 @@ const SelectCapabilities = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchProviderCapabilities();
   }, []);
 
@@ -59,14 +69,14 @@ const SelectCapabilities = () => {
     const selectedCapabilities = capabilities
       .filter((capability) => capability.isSelected)
       .map((capability) => capability.name);
-  
+
     const projectID = localStorage.getItem("projectID");
-  
+
     if (!projectID) {
       console.error("No project ID found");
       return;
     }
-  
+
     // Check if there is a logged-in user before attempting to update the user's document
     if (auth.currentUser) {
       const userID = auth.currentUser.uid;
@@ -77,7 +87,7 @@ const SelectCapabilities = () => {
           let userProjects = userDocSnap.data().projects || [];
           if (!userProjects.includes(projectID)) {
             userProjects.push(projectID); // Add the new project ID to the list
-  
+
             await updateDoc(userDocRef, {
               projects: userProjects,
             });
@@ -90,7 +100,7 @@ const SelectCapabilities = () => {
         return;
       }
     }
-  
+
     const projectDocRef = doc(db, "projects", projectID);
     try {
       await updateDoc(projectDocRef, {
@@ -98,15 +108,35 @@ const SelectCapabilities = () => {
       });
       router.push("/signUp");
     } catch (error) {
-      console.error("Error updating project with selected capabilities:", error);
+      console.error(
+        "Error updating project with selected capabilities:",
+        error
+      );
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center text-center text-white font-montserrat bg-slate-900">
       <div className="h-screen w-2/3 flex items-center justify-center flex-col">
-        <p className="text-3xl">Select capabilities of your integration</p>
-        <div className="w-full flex items-center justify-start flex-col">
+        <p className="text-3xl">
+          Select capabilities of your {providerName} integration
+        </p>
+        <div className="w-full flex py-4 items-center text-yellow-300 justify-start flex-col">
+          {averageIntTime && (
+            <p>
+              Average {providerName} integration time: {averageIntTime}
+            </p>
+          )}
+          {docsLink && (
+            <a
+              href={docsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white underline hover:text-blue-300 mt-4"
+            >
+              View Provider Documentation
+            </a>
+          )}
           <ul className="mt-4 w-full md:w-1/3 text-black">
             {capabilities.map((capability, index) => (
               <li
@@ -123,6 +153,7 @@ const SelectCapabilities = () => {
               </li>
             ))}
           </ul>
+
           <button
             className="standard-button bg-teal-300 text-black"
             onClick={handleContinue}

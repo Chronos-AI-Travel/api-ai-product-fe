@@ -10,6 +10,7 @@ import RepoModal from "../app/components/modals/RepoModal";
 import ActiveProjects from "../app/components/dashboard/ActiveProjects";
 import YourNews from "../app/components/dashboard/YourNews";
 import CompletedProjects from "../app/components/dashboard/CompletedProjects";
+import OpenRequests from "../app/components/dashboard/OpenRequests";
 // import YourRepositories from "../app/components/dashboard/YourRepositories";
 
 export default function Dashboard() {
@@ -112,6 +113,7 @@ export default function Dashboard() {
         <div>
           {/* <YourRepositories repos={repos} handleViewRepo={handleViewRepo} /> */}
           <ActiveProjects projects={projects} />
+          <OpenRequests userUid={userUid} /> {/* Pass userUid as a prop */}
           <CompletedProjects projects={projects} />
           <YourNews />
         </div>

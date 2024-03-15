@@ -1,24 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import FormSubmittedModal from "../../app/components/modals/FormSubmittedModal";
 import { InlineWidget } from "react-calendly";
+import { db, auth } from "../../app/utils/firebaseConfig";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"; 
+import { onAuthStateChanged } from "firebase/auth";
 
 const ProviderRequest = () => {
   const [showModal, setShowModal] = useState(false);
   const [showCalendlyModal, setShowCalendlyModal] = useState(false);
-  const router = useRouter();
+  const [userUid, setUserUid] = useState(null); 
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserUid(user.uid); 
+      }
+    });
+  
+    return () => unsubscribe(); 
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = {
-      fullName: formData.get("fullName"), // Assuming the name attribute of your input field is "fullName"
-      companyName: formData.get("companyName"), // Adjust the name attribute as per your form
-      companyURL: formData.get("companyURL"), // Adjust the name attribute as per your form
-      workEmail: formData.get("workEmail"), // Adjust the name attribute as per your form
-      apiIntegration: formData.get("apiIntegration"), // Adjust the name attribute as per your form
-      requirements: formData.get("requirements"), // Adjust the name attribute as per your form
-      apiDocumentationURL: formData.get("apiDocumentationURL"), // Adjust the name attribute as per your form
+      fullName: formData.get("fullName"),
+      companyName: formData.get("companyName"),
+      companyURL: formData.get("companyURL"),
+      workEmail: formData.get("workEmail"),
+      apiIntegration: formData.get("apiIntegration"),
+      requirements: formData.get("requirements"),
+      apiDocumentationURL: formData.get("apiDocumentationURL"),
+      createdBy: userUid, // Use the state value directly
+      createdAt: serverTimestamp(),
     };
 
     try {
@@ -34,7 +49,8 @@ const ProviderRequest = () => {
       );
 
       if (response.ok) {
-        setShowCalendlyModal(true); // Show Calendly modal upon successful email sending
+        await addDoc(collection(db, "providerRequests"), data);
+        setShowCalendlyModal(true);
       } else {
         console.error("Failed to send provider request email");
       }
