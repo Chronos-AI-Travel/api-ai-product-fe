@@ -13,6 +13,7 @@ const Processing = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { projectId } = router.query;
+  const [sessionID, setSessionID] = useState(null); 
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -90,10 +91,14 @@ const Processing = () => {
         <div className="border-2 border-black rounded-lg p-4 w-full h-3/4 overflow-auto">
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
-              <div className="loader"></div>{" "}
+              <div className="loader"></div>
             </div>
           ) : (
-            agentResponse || "Agent response will appear here..."
+            <div
+              dangerouslySetInnerHTML={{
+                __html: agentResponse ? agentResponse.replace(/<pre>/g, `<pre class="preStyle">`) : "Agent response will appear here..."
+              }}
+            ></div>
           )}
         </div>
       </div>
