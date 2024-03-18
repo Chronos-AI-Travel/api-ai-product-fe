@@ -118,12 +118,12 @@ export default function Dashboard() {
           <YourNews />
         </div>
       </div>
-      <RepoModal
+      {/* <RepoModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         content={modalContent || []}
         userUid={userUid}
-      />
+      /> */}
     </div>
   );
 }
