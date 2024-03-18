@@ -9,7 +9,8 @@ const Processing = () => {
   const [projectName, setProjectName] = useState("");
   const [userInput, setUserInput] = useState("");
   const [agentResponse, setAgentResponse] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Step 1: Add loading state
+  const [fileContent, setFileContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { projectId } = router.query;
 
@@ -30,15 +31,23 @@ const Processing = () => {
   }, [projectId]);
 
   const handleInputSubmit = async () => {
-    setIsLoading(true); // Step 3: Set loading to true when request starts
+    setIsLoading(true);
+    console.log("File content being sent:", fileContent); // Add this line
+    const payload = {
+      input: userInput,
+      chat_history: [],
+      file_content: fileContent,
+    };
     console.log("Submitting user input:", userInput);
+    console.log("Payload sent:", payload); // Log the payload
+
     try {
       const response = await fetch("http://localhost:8000/agent/invoke", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ input: userInput, chat_history: [] }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -62,7 +71,7 @@ const Processing = () => {
         <div className="font-light text-3xl mb-4">
           {projectName || "Loading..."}
         </div>
-        <RepositorySelector />
+        <RepositorySelector setFileContent={setFileContent} />
         <div className="mb-4">
           <input
             type="text"
@@ -82,7 +91,6 @@ const Processing = () => {
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
               <div className="loader"></div>{" "}
-              {/* Step 2: Display loading spinner */}
             </div>
           ) : (
             agentResponse || "Agent response will appear here..."

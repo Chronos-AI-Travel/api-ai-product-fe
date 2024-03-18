@@ -6,22 +6,28 @@ import { db } from "../../app/utils/firebaseConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
-const RepositorySelector = () => {
+const RepositorySelector = ({ setFileContent }) => {
   const [selectedRepo, setSelectedRepo] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userUid, setUserUid] = useState(null);
   const [repos, setRepos] = useState([]);
   const [repoContent, setRepoContent] = useState([]);
   const [selectedFilesContent, setSelectedFilesContent] = useState([]);
-  const [currentFile, setCurrentFile] = useState(null); 
+  const [currentFile, setCurrentFile] = useState(null);
 
   useEffect(() => {
-    console.log('selectedFilesContent', selectedFilesContent);
+    console.log("selectedFilesContent", selectedFilesContent);
   }, [selectedFilesContent]);
 
   const extractFileName = (url) => {
-    return url.split('/').pop(); // Get the last segment of the URL
+    return url.split("/").pop(); // Get the last segment of the URL
   };
+
+  useEffect(() => {
+    // Concatenate the content of all selected files
+    const allContent = selectedFilesContent.map(file => file.content).join("\n");
+    setFileContent(allContent); // Update the parent component's state with the concatenated content
+  }, [selectedFilesContent, setFileContent]);
 
   useEffect(() => {
     const auth = getAuth();
@@ -82,9 +88,9 @@ const RepositorySelector = () => {
 
   const handleFileClick = (file) => {
     if (currentFile && file.url === currentFile.url) {
-      setCurrentFile(null); 
+      setCurrentFile(null);
     } else {
-      setCurrentFile(file); 
+      setCurrentFile(file);
     }
   };
 
@@ -112,21 +118,25 @@ const RepositorySelector = () => {
         />
       )}
       <div className="border p-2 rounded-lg mb-4">
-      <h2>Selected Files for Integration:</h2>
-      <ul>
-        {selectedFilesContent.map((file, index) => (
-          <li key={index} className="border p-2 rounded-lg bg-gray-50 cursor-pointer flex flex-row justify-between items-center" onClick={() => handleFileClick(file)}>
-            {extractFileName(file.url)} <FontAwesomeIcon icon={faPlus}/>
-          </li>
-        ))}
-      </ul>
-      {currentFile && (
-        <div>
-          <pre>{currentFile.content}</pre> 
-        </div>
-      )}
+        <h2>Selected Files for Integration:</h2>
+        <ul>
+          {selectedFilesContent.map((file, index) => (
+            <li
+              key={index}
+              className="border p-2 rounded-lg bg-gray-50 cursor-pointer flex flex-row justify-between items-center"
+              onClick={() => handleFileClick(file)}
+            >
+              {extractFileName(file.url)} <FontAwesomeIcon icon={faPlus} />
+            </li>
+          ))}
+        </ul>
+        {currentFile && (
+          <div>
+            <pre>{currentFile.content}</pre>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
   );
 };
 
