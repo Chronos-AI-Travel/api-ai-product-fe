@@ -63,6 +63,11 @@ const Processing = () => {
   const handleInputSubmit = async () => {
     setIsLoading(true);
 
+    const baseUrl =
+      window.location.hostname === "localhost"
+        ? "http://localhost:8000"
+        : "https://api-ai-langchain-agent.onrender.com";
+
     // Extract projectId from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const session_id = urlParams.get("projectId"); // Assuming the URL parameter is named 'projectId'
@@ -81,7 +86,7 @@ const Processing = () => {
     console.log("Payload sent:", payload);
 
     try {
-      const response = await fetch("http://localhost:8000/agent/invoke", {
+      const response = await fetch(`${baseUrl}/agent/invoke`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
