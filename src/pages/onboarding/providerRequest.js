@@ -41,7 +41,7 @@ const ProviderRequest = () => {
 
     try {
       const response = await fetch(
-        "https://api-ai-product-be.onrender.com/provider_request_email",
+        "https://api-ai-product-be-1.onrender.com/provider_request_email",
         {
           method: "POST",
           headers: {

@@ -19,7 +19,7 @@ export const ContactUs = ({ onClose }) => {
     };
 
     try {
-      const response = await fetch("https://api-ai-product-be.onrender.com/contact_us_email", {
+      const response = await fetch("https://api-ai-product-be-1.onrender.com/contact_us_email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
