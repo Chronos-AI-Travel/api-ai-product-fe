@@ -6,7 +6,7 @@ import { db } from "../../app/utils/firebaseConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
-const RepositorySelector = ({ setFileContent }) => {
+const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
   const [selectedRepo, setSelectedRepo] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userUid, setUserUid] = useState(null);
@@ -15,17 +15,44 @@ const RepositorySelector = ({ setFileContent }) => {
   const [selectedFilesContent, setSelectedFilesContent] = useState([]);
   const [currentFile, setCurrentFile] = useState(null);
 
-  useEffect(() => {
-    console.log("selectedFilesContent", selectedFilesContent);
-  }, [selectedFilesContent]);
+  // useEffect(() => {
+  //   console.log("selectedFilesContent", selectedFilesContent);
+  // }, [selectedFilesContent]);
 
-  const extractFileName = (url) => {
-    return url.split("/").pop(); // Get the last segment of the URL
+  // const extractFileName = (url) => {
+  //   return url.split("/").pop(); // Get the last segment of the URL
+  // };
+
+  const triggerIndexing = async () => {
+    if (!selectedRepo) {
+      alert("Please select a repository first.");
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:8000/index/repository', { // Adjust the URL as needed
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          repo: selectedRepo,
+        }),
+      });
+  
+      const data = await response.json();
+      console.log(data.message);
+      alert(data.message);
+    } catch (error) {
+      console.error("Failed to index repository:", error);
+      alert("Failed to index the repository. Please try again.");
+    }
   };
 
   useEffect(() => {
-    // Concatenate the content of all selected files
-    const allContent = selectedFilesContent.map(file => file.content).join("\n");
+    const allContent = selectedFilesContent
+      .map((file) => file.content)
+      .join("\n");
     setFileContent(allContent); // Update the parent component's state with the concatenated content
   }, [selectedFilesContent, setFileContent]);
 
@@ -62,7 +89,7 @@ const RepositorySelector = ({ setFileContent }) => {
   const handleRepoChange = async (e) => {
     const repoFullName = e.target.value;
     setSelectedRepo(repoFullName);
-    setIsModalOpen(true);
+    // setIsModalOpen(true);
 
     const auth = getAuth();
     const user = auth.currentUser;
@@ -70,6 +97,7 @@ const RepositorySelector = ({ setFileContent }) => {
       const tokenDoc = await getDoc(doc(db, "access_tokens", user.uid));
       if (tokenDoc.exists()) {
         const token = tokenDoc.data().githubAccessToken;
+        onRepoSelect(repoFullName, token);
         const url = `https://api.github.com/repos/${repoFullName}/contents`;
         const response = await fetch(url, {
           headers: {
@@ -95,7 +123,7 @@ const RepositorySelector = ({ setFileContent }) => {
   };
 
   return (
-    <div>
+    <div className="flex gap-2 h-10">
       <select
         onChange={handleRepoChange}
         value={selectedRepo}
@@ -108,16 +136,22 @@ const RepositorySelector = ({ setFileContent }) => {
           </option>
         ))}
       </select>
+      {/* <button
+      onClick={triggerIndexing}
+      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+    >
+      Index Selected Repository
+    </button> */}
       {isModalOpen && (
         <RepoModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          content={repoContent}
+          content={repoContent} 
           userUid={userUid}
           onSelectFiles={handleSelectFiles}
         />
       )}
-      <div className="border p-2 rounded-lg mb-4">
+      {/* <div className="border p-2 rounded-lg mb-4">
         <h2>Selected Files for Integration:</h2>
         <ul>
           {selectedFilesContent.map((file, index) => (
@@ -135,7 +169,7 @@ const RepositorySelector = ({ setFileContent }) => {
             <pre>{currentFile.content}</pre>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

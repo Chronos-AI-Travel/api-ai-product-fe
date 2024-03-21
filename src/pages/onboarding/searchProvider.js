@@ -11,7 +11,9 @@ import {
 } from "firebase/firestore";
 import { db } from "../../app/utils/firebaseConfig";
 import { useRouter } from "next/router";
-import Header from '../../app/components/home/Header'
+import Header from "../../app/components/home/Header";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const SearchProvider = () => {
   const [providers, setProviders] = useState([]);
@@ -43,12 +45,12 @@ const SearchProvider = () => {
 
   const handleSelectProvider = async (provider) => {
     try {
-      const providerDocRef = doc(db, "providers", provider.id); 
+      const providerDocRef = doc(db, "providers", provider.id);
       const providerDocSnap = await getDoc(providerDocRef);
-  
+
       if (providerDocSnap.exists()) {
         const providerData = providerDocSnap.data();
-  
+
         if (providerData.status) {
           const docRef = await addDoc(collection(db, "projects"), {
             providerName: provider.name,
@@ -56,7 +58,7 @@ const SearchProvider = () => {
             createdAt: serverTimestamp(),
             status: "In progress",
           });
-  
+
           localStorage.setItem("projectID", docRef.id);
           localStorage.setItem("selectedProviderID", provider.id); // Set selectedProviderID here
           router.push("/onboarding/selectCapabilities");
@@ -78,7 +80,13 @@ const SearchProvider = () => {
 
   return (
     <div className="flex flex-col items-center justify-center text-center text-white font-montserrat bg-slate-900">
-      <div className="h-screen w-2/3 flex items-center justify-center flex-col">
+      <button
+        className="absolute left-4 top-4 text-white"
+        onClick={() => router.back()}
+      >
+        <FontAwesomeIcon icon={faChevronLeft} /> Back
+      </button>
+      <div className="min-h-screen h-full w-2/3 flex items-center justify-center flex-col">
         <p className="text-3xl">
           Which travel provider do you want to integrate to?
         </p>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../app/utils/firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
+import { db, auth } from "../app/utils/firebaseConfig";
 import Navbar2 from "../app/components/navigation/Navbar2";
 import RepositorySelector from "../app/components/RepositorySelector";
 
@@ -13,7 +14,14 @@ const Processing = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { projectId } = router.query;
-  const [sessionID, setSessionID] = useState(null); 
+  const [sessionID, setSessionID] = useState(null);
+  const [githubAccessToken, setGithubAccessToken] = useState("");
+  const [selectedRepo, setSelectedRepo] = useState("");
+
+  const handleRepoSelection = (repoFullName, token) => {
+    console.log("Selected repository:", repoFullName);
+    setSelectedRepo(repoFullName);
+  };
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -31,16 +39,43 @@ const Processing = () => {
     fetchProject();
   }, [projectId]);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const tokenDoc = await getDoc(doc(db, "access_tokens", user.uid));
+        if (tokenDoc.exists()) {
+          const token = tokenDoc.data().githubAccessToken;
+          setGithubAccessToken(token);
+        } else {
+          console.log("No access token found");
+        }
+      } else {
+        router.push("/signUp");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
   const handleInputSubmit = async () => {
     setIsLoading(true);
-    console.log("File content being sent:", fileContent); // Add this line
+
+    // Extract projectId from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const session_id = urlParams.get("projectId"); // Assuming the URL parameter is named 'projectId'
+
     const payload = {
+      session_id, // Include the extracted session_id in the payload
       input: userInput,
       chat_history: [],
-      file_content: fileContent,
+      github_info: {
+        // access_token: githubAccessToken, // Uncomment if you decide to use it
+        repo: selectedRepo,
+      },
     };
+
     console.log("Submitting user input:", userInput);
-    console.log("Payload sent:", payload); // Log the payload
+    console.log("Payload sent:", payload);
 
     try {
       const response = await fetch("http://localhost:8000/agent/invoke", {
@@ -64,7 +99,6 @@ const Processing = () => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="bg-white h-full">
       <Navbar2 />
@@ -72,20 +106,23 @@ const Processing = () => {
         <div className="font-light text-3xl mb-4">
           {projectName || "Loading..."}
         </div>
-        <RepositorySelector setFileContent={setFileContent} />
+        <RepositorySelector
+          setFileContent={setFileContent}
+          onRepoSelect={handleRepoSelection}
+        />
         <div className="mb-4">
-          <input
+          {/* <input
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             placeholder="Type your request here"
             className="border-2 border-gray-300 rounded-lg p-2 w-full"
-          />
+          /> */}
           <button
             onClick={handleInputSubmit}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
+            className="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg"
           >
-            Submit
+            Start Integration
           </button>
         </div>
         <div className="border-2 border-black rounded-lg p-4 w-full h-3/4 overflow-auto">
@@ -96,7 +133,9 @@ const Processing = () => {
           ) : (
             <div
               dangerouslySetInnerHTML={{
-                __html: agentResponse ? agentResponse.replace(/<pre>/g, `<pre class="preStyle">`) : "Agent response will appear here..."
+                __html: agentResponse
+                  ? agentResponse.replace(/<pre>/g, `<pre class="preStyle">`)
+                  : "Agent response will appear here...",
               }}
             ></div>
           )}

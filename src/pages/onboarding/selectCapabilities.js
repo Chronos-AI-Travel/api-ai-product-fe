@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../app/utils/firebaseConfig";
 import { useRouter } from "next/router";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const SelectCapabilities = () => {
   const [capabilities, setCapabilities] = useState([]);
@@ -117,7 +119,13 @@ const SelectCapabilities = () => {
 
   return (
     <div className="flex flex-col items-center justify-center text-center text-white font-montserrat bg-slate-900">
-      <div className="h-screen w-2/3 flex items-center justify-center flex-col">
+      <button
+        className="absolute left-4 top-4 text-white"
+        onClick={() => router.back()}
+      >
+        <FontAwesomeIcon icon={faChevronLeft} /> Back
+      </button>
+      <div className="min-h-screen h-full py-20 w-2/3 flex items-center justify-center flex-col">
         <p className="text-3xl">
           Select capabilities of your {providerName} integration
         </p>
