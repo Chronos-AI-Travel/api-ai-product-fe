@@ -5,6 +5,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../app/utils/firebaseConfig";
 import Navbar2 from "../app/components/navigation/Navbar2";
 import RepositorySelector from "../app/components/RepositorySelector";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
 
 const Processing = () => {
   const [projectName, setProjectName] = useState("");
@@ -110,7 +113,7 @@ const Processing = () => {
           setFileContent={setFileContent}
           onRepoSelect={handleRepoSelection}
         />
-        <div className="mb-4">
+        <div className="my-4 flex w-full items-center flex-row justify-between">
           {/* <input
             type="text"
             value={userInput}
@@ -120,9 +123,14 @@ const Processing = () => {
           /> */}
           <button
             onClick={handleInputSubmit}
-            className="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg"
+            className="mt-2 px-4 flex standard-button items-center gap-2 py-2 bg-green-500 text-white rounded-lg"
           >
+            <FontAwesomeIcon icon={faPlay} />
             Start Integration
+          </button>
+          <button className="mt-2 px-4 py-2 flex standard-button items-center gap-2 bg-blue-500 text-white rounded-lg">
+            <Image src="/github-icon.svg" alt="GitHub" width={20} height={20} />
+            Add File to New Branch
           </button>
         </div>
         <div className="border-2 border-black rounded-lg p-4 w-full h-3/4 overflow-auto">

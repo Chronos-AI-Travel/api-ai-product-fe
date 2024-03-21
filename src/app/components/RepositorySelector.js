@@ -4,7 +4,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../app/utils/firebaseConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
   const [selectedRepo, setSelectedRepo] = useState("");
@@ -28,18 +28,19 @@ const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
       alert("Please select a repository first.");
       return;
     }
-  
+
     try {
-      const response = await fetch('http://localhost:8000/index/repository', { // Adjust the URL as needed
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/index/repository", {
+        // Adjust the URL as needed
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           repo: selectedRepo,
         }),
       });
-  
+
       const data = await response.json();
       console.log(data.message);
       alert(data.message);
@@ -124,18 +125,24 @@ const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
 
   return (
     <div className="flex gap-2 h-10">
-      <select
-        onChange={handleRepoChange}
-        value={selectedRepo}
-        className="select-class border mb-4 h-10"
-      >
-        <option value="">Select a Repository</option>
-        {repos.map((repo, index) => (
-          <option key={index} value={repo.full_name}>
-            {repo.name}
-          </option>
-        ))}
-      </select>
+      <div className="flex gap-2 h-10  relative">
+        <select
+          onChange={handleRepoChange}
+          value={selectedRepo}
+          className="border-black bg-white rounded-lg hover:bg-gray-300 cursor-pointer border mb-0 h-10 appearance-none outline-none shadow-black shadow-sm pl-3 pr-8"
+        >
+          <option value="">Select a Repository</option>
+          {repos.map((repo, index) => (
+            <option key={index} value={repo.full_name}>
+              {repo.name}
+            </option>
+          ))}
+        </select>
+        <FontAwesomeIcon
+          icon={faChevronDown}
+          className="absolute right-2 top-3 pointer-events-none"
+        />
+      </div>
       {/* <button
       onClick={triggerIndexing}
       className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -146,7 +153,7 @@ const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
         <RepoModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          content={repoContent} 
+          content={repoContent}
           userUid={userUid}
           onSelectFiles={handleSelectFiles}
         />
