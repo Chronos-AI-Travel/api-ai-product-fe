@@ -123,12 +123,24 @@ const Processing = () => {
           /> */}
           <button
             onClick={handleInputSubmit}
-            className="mt-2 px-4 flex standard-button items-center gap-2 py-2 bg-green-500 text-white rounded-lg"
+            disabled={!selectedRepo} // Button is disabled if selectedRepo is falsy
+            className={`mt-2 px-4 flex standard-button w-56 items-center gap-2 py-2 rounded-lg ${
+              selectedRepo
+                ? "bg-green-500 text-white"
+                : "bg-gray-400 text-gray-200 cursor-not-allowed"
+            }`}
           >
             <FontAwesomeIcon icon={faPlay} />
             Start Integration
           </button>
-          <button className="mt-2 px-4 py-2 flex standard-button items-center gap-2 bg-blue-500 text-white rounded-lg">
+          <button
+            disabled={!agentResponse} // Button is disabled if agentResponse is falsy
+            className={`mt-2 px-4 py-2 flex standard-button items-center gap-2 rounded-lg ${
+              agentResponse
+                ? "bg-blue-500 text-white"
+                : "bg-gray-400 text-gray-200 cursor-not-allowed"
+            }`}
+          >
             <Image src="/github-icon.svg" alt="GitHub" width={20} height={20} />
             Add File to New Branch
           </button>

@@ -125,11 +125,11 @@ const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
 
   return (
     <div className="flex gap-2 h-10">
-      <div className="flex gap-2 h-10  relative">
+      <div className="flex gap-2 h-10 w-56  relative">
         <select
           onChange={handleRepoChange}
           value={selectedRepo}
-          className="border-black bg-white rounded-lg hover:bg-gray-300 cursor-pointer border mb-0 h-10 appearance-none outline-none shadow-black shadow-sm pl-3 pr-8"
+          className="border-black w-56 bg-white rounded-lg hover:bg-gray-300 cursor-pointer border mb-0 h-10 appearance-none outline-none shadow-black shadow-sm pl-3 pr-8"
         >
           <option value="">Select a Repository</option>
           {repos.map((repo, index) => (
