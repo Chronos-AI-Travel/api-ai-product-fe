@@ -41,7 +41,7 @@ const SelectCapabilities = () => {
               isSelected: false,
             }))
           );
-          setDocsLink(providerData.docsLink || "");
+          setDocsLink(providerData.docslink || "");
           setProviderName(providerData.name);
           setAverageIntTime(providerData.averageIntTime);
         } else {
