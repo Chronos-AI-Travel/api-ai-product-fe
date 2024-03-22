@@ -17,15 +17,11 @@ const Processing = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { projectId } = router.query;
-  const [sessionID, setSessionID] = useState(null);
+  const [branchCreated, setBranchCreated] = useState(false);
   const [githubAccessToken, setGithubAccessToken] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("");
 
-  const handleRepoSelection = (repoFullName, token) => {
-    console.log("Selected repository:", repoFullName);
-    setSelectedRepo(repoFullName);
-  };
-
+  // Get Project Information
   useEffect(() => {
     const fetchProject = async () => {
       if (!projectId) return;
@@ -42,6 +38,14 @@ const Processing = () => {
     fetchProject();
   }, [projectId]);
 
+  // Get the Repo Information
+  const handleRepoSelection = (repoFullName, token) => {
+    console.log("Selected repository:", repoFullName);
+    setSelectedRepo(repoFullName);
+    setGithubAccessToken(token);
+  };
+
+  // Get Access Token
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -60,6 +64,7 @@ const Processing = () => {
     return () => unsubscribe();
   }, [router]);
 
+  // Trigger Integration
   const handleInputSubmit = async () => {
     setIsLoading(true);
 
@@ -107,6 +112,116 @@ const Processing = () => {
       setIsLoading(false);
     }
   };
+
+  // Create New Branch
+  const createNewBranch = async () => {
+    const ownerRepo = selectedRepo.split("/");
+    const owner = ownerRepo[0];
+    const repo = ownerRepo[1];
+    const baseBranch = "main";
+    try {
+      const branchesResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/branches`,
+        {
+          headers: {
+            Authorization: `Bearer ${githubAccessToken}`,
+            Accept: "application/vnd.github.v3+json",
+          },
+        }
+      );
+      const branches = await branchesResponse.json();
+      const branchNames = branches.map((branch) => branch.name);
+      let branchNumber = 1;
+      let newBranchName = `chronos-integration-${branchNumber}`;
+      while (branchNames.includes(newBranchName)) {
+        branchNumber++;
+        newBranchName = `chronos-integration-${branchNumber}`;
+      }
+      const baseBranchResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${baseBranch}`,
+        {
+          headers: {
+            Authorization: `Bearer ${githubAccessToken}`,
+            Accept: "application/vnd.github.v3+json",
+          },
+        }
+      );
+      const baseBranchData = await baseBranchResponse.json();
+      const baseSha = baseBranchData.object.sha;
+      const createBranchResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/git/refs`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${githubAccessToken}`,
+            Accept: "application/vnd.github.v3+json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ref: `refs/heads/${newBranchName}`,
+            sha: baseSha,
+          }),
+        }
+      );
+      if (createBranchResponse.ok) {
+        console.log(`Branch ${newBranchName} created successfully.`);
+        setBranchCreated(true);
+        let fileName = agentResponse.split("\n")[0];
+        fileName = fileName.replace(/<[^>]+>/g, "");
+        const fileContent = agentResponse.substring(
+          agentResponse.indexOf("\n") + 1
+        );
+        const contentBase64 = btoa(unescape(encodeURIComponent(fileContent)));
+        const fileExistsResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}?ref=${newBranchName}`,
+          {
+            headers: {
+              Authorization: `Bearer ${githubAccessToken}`,
+              Accept: "application/vnd.github.v3+json",
+            },
+          }
+        );
+
+        let sha = "";
+        if (fileExistsResponse.status === 200) {
+          const fileData = await fileExistsResponse.json();
+          sha = fileData.sha;
+        }
+
+        const createOrUpdateFileResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${githubAccessToken}`,
+              Accept: "application/vnd.github.v3+json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: `Create or update ${fileName}`,
+              content: contentBase64,
+              branch: newBranchName,
+              sha: sha,
+            }),
+          }
+        );
+
+        if (createOrUpdateFileResponse.ok) {
+          console.log(
+            `${fileName} created or updated successfully in ${newBranchName} branch.`
+          );
+        } else {
+          console.error(`Failed to create or update ${fileName}.`);
+        }
+      } else {
+        console.error("Failed to create the branch.");
+        setBranchCreated(false);
+      }
+    } catch (error) {
+      console.error("Error creating new branch:", error);
+    }
+  };
+
   return (
     <div className="bg-white h-full">
       <Navbar2 />
@@ -139,15 +254,15 @@ const Processing = () => {
             Start Integration
           </button>
           <button
-            disabled={!agentResponse} // Button is disabled if agentResponse is falsy
+            onClick={createNewBranch}
+            disabled={!agentResponse || branchCreated}
             className={`mt-2 px-4 py-2 flex standard-button items-center gap-2 rounded-lg ${
               agentResponse
                 ? "bg-blue-500 text-white"
                 : "bg-gray-400 text-gray-200 cursor-not-allowed"
             }`}
           >
-            <Image src="/github-icon.svg" alt="GitHub" width={20} height={20} />
-            Add File to New Branch
+            {branchCreated ? "Branch Created!" : "Add File to New Branch"}
           </button>
         </div>
         <div className="border-2 border-black rounded-lg p-4 w-full h-3/4 overflow-auto">

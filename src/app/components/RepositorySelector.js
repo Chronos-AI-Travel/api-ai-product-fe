@@ -15,13 +15,6 @@ const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
   const [selectedFilesContent, setSelectedFilesContent] = useState([]);
   const [currentFile, setCurrentFile] = useState(null);
 
-  // useEffect(() => {
-  //   console.log("selectedFilesContent", selectedFilesContent);
-  // }, [selectedFilesContent]);
-
-  // const extractFileName = (url) => {
-  //   return url.split("/").pop(); // Get the last segment of the URL
-  // };
 
   const triggerIndexing = async () => {
     if (!selectedRepo) {
@@ -31,7 +24,6 @@ const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
 
     try {
       const response = await fetch("http://localhost:8000/index/repository", {
-        // Adjust the URL as needed
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -113,15 +105,8 @@ const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
     }
   };
 
+  // Close the Modal
   const closeModal = () => setIsModalOpen(false);
-
-  const handleFileClick = (file) => {
-    if (currentFile && file.url === currentFile.url) {
-      setCurrentFile(null);
-    } else {
-      setCurrentFile(file);
-    }
-  };
 
   return (
     <div className="flex gap-2 h-10">
