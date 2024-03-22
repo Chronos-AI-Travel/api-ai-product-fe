@@ -22,20 +22,25 @@ const ActiveProjects = ({ projects }) => {
               onClick={() => handleProjectClick(project.id)}
               style={{ cursor: "pointer" }}
             >
-              <span className="text-lg font-semibold">
-                {project.providerName}
-              </span>
-              <ul>
-                {project.capabilities && Array.isArray(project.capabilities) ? (
-                  project.capabilities.map((capability, capIndex) => (
-                    <li className="text-sm font-light" key={capIndex}>
-                      - {capability}
+              <div>
+                <span className="text-lg font-semibold">
+                  {project.providerName}
+                </span>
+                <ul>
+                  {project.capabilities &&
+                  Array.isArray(project.capabilities) ? (
+                    project.capabilities.map((capability, capIndex) => (
+                      <li className="text-sm font-light" key={capIndex}>
+                        - {capability}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-sm font-light">
+                      No capabilities listed
                     </li>
-                  ))
-                ) : (
-                  <li className="text-sm font-light">No capabilities listed</li>
-                )}
-              </ul>
+                  )}
+                </ul>
+              </div>
               <div className="text-right">
                 <span className="text-xs font-light">
                   {project.createdAt.toDate().toLocaleDateString()}

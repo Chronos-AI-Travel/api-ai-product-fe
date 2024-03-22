@@ -20,6 +20,8 @@ const Processing = () => {
   const [branchCreated, setBranchCreated] = useState(false);
   const [githubAccessToken, setGithubAccessToken] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("");
+  const [docsLink, setDocsLink] = useState("");
+  const [vertical, setVertical] = useState("");
 
   // Get Project Information
   useEffect(() => {
@@ -30,8 +32,21 @@ const Processing = () => {
 
       if (docSnap.exists()) {
         setProjectName(docSnap.data().providerName);
+        const providerID = docSnap.data().providerID;
+
+        const providerRef = doc(db, "providers", providerID);
+        const providerSnap = await getDoc(providerRef);
+
+        if (providerSnap.exists()) {
+          const docslink = providerSnap.data().docslink;
+          const vertical = providerSnap.data().vertical;
+          setDocsLink(docslink);
+          setVertical(vertical);
+        } else {
+          console.log("No such provider document!");
+        }
       } else {
-        console.log("No such document!");
+        console.log("No such project document!");
       }
     };
 
@@ -75,16 +90,15 @@ const Processing = () => {
 
     // Extract projectId from the URL
     const urlParams = new URLSearchParams(window.location.search);
-    const session_id = urlParams.get("projectId"); // Assuming the URL parameter is named 'projectId'
+    const session_id = urlParams.get("projectId");
 
     const payload = {
-      session_id, // Include the extracted session_id in the payload
+      session_id,
       input: userInput,
       chat_history: [],
-      github_info: {
-        // access_token: githubAccessToken, // Uncomment if you decide to use it
-        repo: selectedRepo,
-      },
+      docslink: docsLink,
+      vertical: vertical,
+      repo: selectedRepo,
     };
 
     console.log("Submitting user input:", userInput);
@@ -244,9 +258,9 @@ const Processing = () => {
           <button
             onClick={handleInputSubmit}
             disabled={!selectedRepo} // Button is disabled if selectedRepo is falsy
-            className={`mt-2 px-4 flex standard-button w-56 items-center gap-2 py-2 rounded-lg ${
+            className={`mt-2 px-4 flex  w-56 items-center gap-2 py-2 rounded-lg ${
               selectedRepo
-                ? "bg-green-500 text-white"
+                ? "bg-green-500 text-white standard-button"
                 : "bg-gray-400 text-gray-200 cursor-not-allowed"
             }`}
           >
@@ -256,9 +270,9 @@ const Processing = () => {
           <button
             onClick={createNewBranch}
             disabled={!agentResponse || branchCreated}
-            className={`mt-2 px-4 py-2 flex standard-button items-center gap-2 rounded-lg ${
+            className={`mt-2 px-4 py-2 flex  items-center gap-2 rounded-lg ${
               agentResponse
-                ? "bg-blue-500 text-white"
+                ? "bg-blue-500 text-white standard-button"
                 : "bg-gray-400 text-gray-200 cursor-not-allowed"
             }`}
           >
@@ -275,7 +289,7 @@ const Processing = () => {
               dangerouslySetInnerHTML={{
                 __html: agentResponse
                   ? agentResponse.replace(/<pre>/g, `<pre class="preStyle">`)
-                  : "Agent response will appear here...",
+                  : "Your code will appear here...",
               }}
             ></div>
           )}
