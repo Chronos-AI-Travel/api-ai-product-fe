@@ -79,14 +79,14 @@ const SearchProvider = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center text-center text-white font-montserrat bg-slate-900">
+    <div className="flex flex-col min-h-screen max-h-fit items-center justify-center text-center text-white font-montserrat bg-slate-900">
       <button
         className="absolute left-4 top-4 text-white"
         onClick={() => router.back()}
       >
         <FontAwesomeIcon icon={faChevronLeft} /> Back
       </button>
-      <div className="min-h-screen h-full w-2/3 flex items-center justify-center flex-col">
+      <div className="w-2/3 flex items-center justify-center flex-col">
         <p className="text-3xl">
           Which travel provider do you want to integrate to?
         </p>
@@ -99,7 +99,7 @@ const SearchProvider = () => {
             onFocus={() => setSearchTerm("")}
           />
           {searchTerm && (
-            <div className="absolute top-full text-left mt-1 w-full md:w-1/2 bg-white text-black rounded z-10">
+            <div className="absolute top-full text-left mt-1 w-full md:w-1/2 bg-white text-black rounded z-10 max-h-60 overflow-y-auto">
               {filteredProviders.map((provider) => (
                 <div
                   key={provider.id}
