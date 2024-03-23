@@ -7,7 +7,8 @@ import Navbar2 from "../app/components/navigation/Navbar2";
 import RepositorySelector from "../app/components/RepositorySelector";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import Image from "next/image";
+import OurProcess from "../app/components/OurProcess";
+import Status from "../app/components/Status";
 
 const Processing = () => {
   const [projectName, setProjectName] = useState("");
@@ -22,6 +23,7 @@ const Processing = () => {
   const [selectedRepo, setSelectedRepo] = useState("");
   const [docsLink, setDocsLink] = useState("");
   const [vertical, setVertical] = useState("");
+  const [status, setStatus] = useState("");
 
   // Get Project Information
   useEffect(() => {
@@ -33,6 +35,7 @@ const Processing = () => {
       if (docSnap.exists()) {
         setProjectName(docSnap.data().providerName);
         const providerID = docSnap.data().providerID;
+        setStatus(docSnap.data().status);
 
         const providerRef = doc(db, "providers", providerID);
         const providerSnap = await getDoc(providerRef);
@@ -52,6 +55,11 @@ const Processing = () => {
 
     fetchProject();
   }, [projectId]);
+
+  // Update Status
+  const updateStatus = (newStatus) => {
+    setStatus(newStatus);
+  };
 
   // Get the Repo Information
   const handleRepoSelection = (repoFullName, token) => {
@@ -118,7 +126,13 @@ const Processing = () => {
       }
 
       const data = await response.json();
-      setAgentResponse(data.output);
+      console.log("data:", data);
+      if (data.step === 1) {
+        console.log("Suggested files:", data.suggested_files);
+        setAgentResponse({ content: data.suggested_files, step: data.step });
+      } else {
+        setAgentResponse({ content: data.output, step: data.step });
+      }
     } catch (error) {
       console.error("Failed to fetch:", error);
       setAgentResponse("Failed to get response from the agent");
@@ -237,11 +251,18 @@ const Processing = () => {
   };
 
   return (
-    <div className="bg-white h-full">
+    <div className="bg-white w-full h-full">
       <Navbar2 />
-      <div className="flex min-h-screen h-full items-start justify-start flex-col p-4">
-        <div className="font-light text-3xl mb-4">
-          {projectName || "Loading..."}
+      <div className="flex min-h-screen w-full h-full items-start flex-col p-4">
+        <div className="flex w-full flex-row items-center justify-between">
+          <div className="font-light text-3xl mb-4">
+            {projectName || "Loading..."}
+          </div>
+          <Status
+            projectId={projectId}
+            status={status}
+            updateStatus={updateStatus}
+          />
         </div>
         <RepositorySelector
           setFileContent={setFileContent}
@@ -257,19 +278,21 @@ const Processing = () => {
           /> */}
           <button
             onClick={handleInputSubmit}
-            disabled={!selectedRepo} // Button is disabled if selectedRepo is falsy
-            className={`mt-2 px-4 flex  w-56 items-center gap-2 py-2 rounded-lg ${
+            disabled={!selectedRepo}
+            className={`mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg ${
               selectedRepo
                 ? "bg-green-500 text-white standard-button"
                 : "bg-gray-400 text-gray-200 cursor-not-allowed"
             }`}
           >
             <FontAwesomeIcon icon={faPlay} />
-            Start Integration
+            {agentResponse.step === 1 || agentResponse.step === 2
+              ? "Continue"
+              : "Start Integration"}
           </button>
           <button
             onClick={createNewBranch}
-            disabled={!agentResponse || branchCreated}
+            disabled={!agentResponse.step === 1 || branchCreated}
             className={`mt-2 px-4 py-2 flex  items-center gap-2 rounded-lg ${
               agentResponse
                 ? "bg-blue-500 text-white standard-button"
@@ -285,13 +308,61 @@ const Processing = () => {
               <div className="loader"></div>
             </div>
           ) : (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: agentResponse
-                  ? agentResponse.replace(/<pre>/g, `<pre class="preStyle">`)
-                  : "Your code will appear here...",
-              }}
-            ></div>
+            <div>
+              {agentResponse.content ? (
+                agentResponse.step === 1 ? (
+                  <div>
+                    <p className="text-xl pt-2">
+                      We&apos;ve analysed your codebase! Looks like its these
+                      files we need to work on 🤔
+                    </p>
+                    <p className="font-semibold py-2">
+                      Press Continue to proceed to the next step
+                    </p>
+                    <ul>
+                      {agentResponse.content.split("\n").map((file, index) => (
+                        <li key={index} className="p-2 border rounded-md mb-2">
+                          {file}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-xl">
+                      Here is your updated file, add the file to a new branch
+                      and give it a test!
+                    </p>
+                    <pre className="preStyle">{agentResponse.content}</pre>
+                  </div>
+                )
+              ) : selectedRepo ? (
+                <div>
+                  <p className="text-xl p-2">
+                    Integrating{" "}
+                    <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
+                      {projectName}
+                    </span>{" "}
+                    into{" "}
+                    <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
+                      {selectedRepo}
+                    </span>
+                  </p>
+                  <OurProcess />
+                </div>
+              ) : (
+                <div>
+                  <p className="text-xl p-2">
+                    Select a Repository to integrate with the{" "}
+                    <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
+                      {projectName}
+                    </span>{" "}
+                    API, and let&apos;s get started!
+                  </p>
+                  <OurProcess />
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
