@@ -12,7 +12,7 @@ const ActiveProjects = ({ projects }) => {
   return (
     <div>
       <h2 className="font-semibold my-2 text-white">Active Projects</h2>
-      <ul className="flex overflow-x-auto w-full mb-4 p-2 gap-2 rounded-lg">
+      <ul className="flex overflow-x-auto w-full mb-4 p-2 gap-2 rounded-lg" style={{ display: 'inline-flex', whiteSpace: 'nowrap' }}>
         {projects
           .filter((project) => project.status === "In progress")
           .map((project, index) => (

@@ -96,7 +96,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-screen w-full font-montserrat bg-slate-900 overflow-hidden px-4">
+<div className="flex flex-col h-full min-h-screen w-full font-montserrat bg-slate-900 overflow-hidden px-4">
       <Navbar2 />
       <div className="flex flex-col items-start justify-start w-full p-4">
         {/* {userEmail && (
@@ -110,7 +110,7 @@ export default function Dashboard() {
         >
           Start New Project
         </button>
-        <div>
+        <div className="w-full overflow-hidden"> {/* Wrapper to potentially help with scrolling */}
           {/* <YourRepositories repos={repos} handleViewRepo={handleViewRepo} /> */}
           <ActiveProjects projects={projects} />
           <OpenRequests userUid={userUid} /> {/* Pass userUid as a prop */}

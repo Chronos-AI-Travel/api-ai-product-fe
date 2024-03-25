@@ -6,7 +6,7 @@ import { db, auth } from "../app/utils/firebaseConfig";
 import Navbar2 from "../app/components/navigation/Navbar2";
 import RepositorySelector from "../app/components/RepositorySelector";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import { faFile, faPlay } from "@fortawesome/free-solid-svg-icons";
 import OurProcess from "../app/components/OurProcess";
 import Status from "../app/components/Status";
 
@@ -24,6 +24,7 @@ const Processing = () => {
   const [docsLink, setDocsLink] = useState("");
   const [vertical, setVertical] = useState("");
   const [status, setStatus] = useState("");
+  const [finalStep, setFinalStep] = useState(false);
 
   // Get Project Information
   useEffect(() => {
@@ -139,6 +140,11 @@ const Processing = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Set Final Step
+  const handleFinalStep = () => {
+    setFinalStep(true);
   };
 
   // Create New Branch
@@ -276,69 +282,194 @@ const Processing = () => {
             placeholder="Type your request here"
             className="border-2 border-gray-300 rounded-lg p-2 w-full"
           /> */}
-          <button
-            onClick={handleInputSubmit}
-            disabled={!selectedRepo}
-            className={`mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg ${
-              selectedRepo
-                ? "bg-green-500 text-white standard-button"
-                : "bg-gray-400 text-gray-200 cursor-not-allowed"
-            }`}
-          >
-            <FontAwesomeIcon icon={faPlay} />
-            {agentResponse.step === 1 || agentResponse.step === 2
-              ? "Continue"
-              : "Start Integration"}
-          </button>
-          <button
-            onClick={createNewBranch}
-            disabled={!agentResponse.step === 1 || branchCreated}
-            className={`mt-2 px-4 py-2 flex  items-center gap-2 rounded-lg ${
-              agentResponse
-                ? "bg-blue-500 text-white standard-button"
-                : "bg-gray-400 text-gray-200 cursor-not-allowed"
-            }`}
-          >
-            {branchCreated ? "Branch Created!" : "Add File to New Branch"}
-          </button>
+          {agentResponse.step === 7 ? (
+            <button
+              onClick={handleFinalStep}
+              className="mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg bg-green-500 text-white"
+            >
+              <FontAwesomeIcon icon={faPlay} />
+              Continue
+            </button>
+          ) : (
+            <button
+              onClick={handleInputSubmit}
+              disabled={!selectedRepo}
+              className={`mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg ${
+                selectedRepo
+                  ? "bg-green-500 text-white standard-button"
+                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
+              }`}
+            >
+              <FontAwesomeIcon icon={faPlay} />
+              {agentResponse.step >= 1 && agentResponse.step < 7
+                ? "Continue"
+                : "Start Integration"}
+            </button>
+          )}
         </div>
-        <div className="border-2 border-black rounded-lg p-4 w-full h-3/4 overflow-auto">
+        <div className="border-2 bg-gray-100 border-black rounded-lg p-0 w-full h-3/4 overflow-auto">
           {isLoading ? (
-            <div className="flex justify-center items-center h-full">
-              <div className="loader"></div>
+            <div>
+              <OurProcess
+                isRepoSelected={!!selectedRepo}
+                currentStep={agentResponse.step}
+              />
+              <div className="flex justify-center flex-col py-8 items-center h-full">
+                <div className="loader"></div>
+              </div>
+            </div>
+          ) : finalStep ? (
+            <div>
+              <OurProcess
+                isRepoSelected={!!selectedRepo}
+                currentStep={agentResponse.step}
+                finalStep={finalStep}
+              />
+              <div className="bg-white p-4 m-4 flex items-center flex-col justify-center">
+                <p className="text-xl text-center p-4 m-4 bg-white">
+                  Now all thats left is to create a new branch with your
+                  integration, run, and test it. ▶️
+                </p>
+                <button
+                  onClick={createNewBranch}
+                  disabled={!agentResponse.step === 1 || branchCreated}
+                  className={`mt-2 px-4 py-2 flex  items-center gap-2 rounded-lg ${
+                    agentResponse
+                      ? "bg-blue-500 text-white standard-button"
+                      : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  }`}
+                >
+                  {branchCreated ? "Branch Created!" : "Create New Branch"}
+                </button>
+              </div>
             </div>
           ) : (
             <div>
               {agentResponse.content ? (
                 agentResponse.step === 1 ? (
                   <div>
-                    <p className="text-xl pt-2">
+                    <OurProcess
+                      isRepoSelected={!!selectedRepo}
+                      currentStep={agentResponse.step}
+                    />
+                    <p className="text-xl text-center p-4 m-4 bg-white">
                       We&apos;ve analysed your codebase! Looks like its these
                       files we need to work on 🤔
                     </p>
-                    <p className="font-semibold py-2">
-                      Press Continue to proceed to the next step
-                    </p>
-                    <ul>
-                      {agentResponse.content.split("\n").map((file, index) => (
-                        <li key={index} className="p-2 border rounded-md mb-2">
-                          {file}
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="m-4">
+                      <p className="font-semibold py-2">
+                        Press Continue to proceed to the next step
+                      </p>
+                      <ul>
+                        {agentResponse.content
+                          .split("\n")
+                          .map((file, index) => (
+                            <li
+                              key={index}
+                              className="p-2 flex w-fit items-center text-lg gap-2 border bg-white rounded-md mb-2"
+                            >
+                              <FontAwesomeIcon
+                                className="text-gray-600 text-xs"
+                                icon={faFile}
+                              />
+                              {file}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
                   </div>
-                ) : (
+                ) : agentResponse.step === 2 ? (
                   <div>
-                    <p className="text-xl">
-                      Here is your updated file, add the file to a new branch
-                      and give it a test!
+                    <OurProcess
+                      isRepoSelected={!!selectedRepo}
+                      currentStep={agentResponse.step}
+                    />
+                    <p className="text-xl text-center p-4 m-4 bg-white">
+                      To get started, we have created the functions for your
+                      integration. Next, we will create the UI elements.
                     </p>
-                    <pre className="preStyle">{agentResponse.content}</pre>
+                    <pre className="preStyle m-4 p-4">
+                      {agentResponse.content}
+                    </pre>
                   </div>
-                )
+                ) : agentResponse.step === 3 ? (
+                  <div>
+                    <OurProcess
+                      isRepoSelected={!!selectedRepo}
+                      currentStep={agentResponse.step}
+                    />
+                    <p className="text-xl text-center p-4 m-4 bg-white">
+                      Great! We&apos;ve proposed updates for your UI components
+                      based on the integration. Here&apos;s what you can add or
+                      update:
+                    </p>
+                    <pre className="preStyle m-4 p-4">
+                      {agentResponse.content}
+                    </pre>
+                  </div>
+                ) : agentResponse.step === 4 ? (
+                  <div>
+                    <OurProcess
+                      isRepoSelected={!!selectedRepo}
+                      currentStep={agentResponse.step}
+                    />
+                    <p className="text-xl text-center p-4 m-4 bg-white">
+                      We&apos;ve identified the backend endpoints that need to
+                      be created or updated. Here are the proposed backend
+                      endpoints for your integration:
+                    </p>
+                    <pre className="preStyle m-4 p-4">
+                      {agentResponse.content}
+                    </pre>
+                  </div>
+                ) : agentResponse.step === 5 ? (
+                  <div>
+                    <OurProcess
+                      isRepoSelected={!!selectedRepo}
+                      currentStep={agentResponse.step}
+                    />
+                    <p className="text-xl text-center p-4 m-4 bg-white">
+                      Make sure you have your API Key and have placed it in your
+                      environment variables!
+                    </p>
+                    <pre className="preStyle m-4 p-4">
+                      {agentResponse.content}
+                    </pre>
+                  </div>
+                ) : agentResponse.step === 6 ? (
+                  <div>
+                    <OurProcess
+                      isRepoSelected={!!selectedRepo}
+                      currentStep={agentResponse.step}
+                    />
+                    <p className="text-xl text-center p-4 m-4 bg-white">
+                      We have created integration tests that you can run to
+                      check the status of your integration.
+                    </p>
+                    <pre className="preStyle m-4 p-4">
+                      {agentResponse.content}
+                    </pre>
+                  </div>
+                ) : agentResponse.step === 7 ? (
+                  <div>
+                    <OurProcess
+                      isRepoSelected={!!selectedRepo}
+                      currentStep={agentResponse.step}
+                    />
+                    <p className="text-xl text-center p-4 m-4 bg-white">
+                      Based on your codebase, here are a list of things that may
+                      be impacted by this integration. Select the ones you want
+                      us to refactor to incorporate your new API integration.
+                    </p>
+                    <pre className="preStyle m-4 p-4">
+                      {agentResponse.content}
+                    </pre>
+                  </div>
+                ) : null
               ) : selectedRepo ? (
                 <div>
-                  <p className="text-xl p-2">
+                  <OurProcess isRepoSelected={!!selectedRepo} />
+                  <p className="text-xl text-center p-4 m-4 bg-white">
                     Integrating{" "}
                     <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
                       {projectName}
@@ -347,19 +478,19 @@ const Processing = () => {
                     <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
                       {selectedRepo}
                     </span>
+                    {" "}🎉
                   </p>
-                  <OurProcess />
                 </div>
               ) : (
                 <div>
-                  <p className="text-xl p-2">
+                  <OurProcess />
+                  <p className="text-xl text-center p-4 m-4 bg-white">
                     Select a Repository to integrate with the{" "}
                     <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
                       {projectName}
                     </span>{" "}
-                    API, and let&apos;s get started!
+                    API, and let&apos;s get started!🖱️
                   </p>
-                  <OurProcess />
                 </div>
               )}
             </div>
