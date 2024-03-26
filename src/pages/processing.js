@@ -6,9 +6,14 @@ import { db, auth } from "../app/utils/firebaseConfig";
 import Navbar2 from "../app/components/navigation/Navbar2";
 import RepositorySelector from "../app/components/RepositorySelector";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile, faPlay } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFile,
+  faHandPointer,
+  faPlay,
+} from "@fortawesome/free-solid-svg-icons";
 import OurProcess from "../app/components/OurProcess";
 import Status from "../app/components/Status";
+import FileSelector from "../app/components/FileSelector";
 
 const Processing = () => {
   const [projectName, setProjectName] = useState("");
@@ -25,6 +30,9 @@ const Processing = () => {
   const [vertical, setVertical] = useState("");
   const [status, setStatus] = useState("");
   const [finalStep, setFinalStep] = useState(false);
+  const [isFileSelectorOpen, setIsFileSelectorOpen] = useState(false);
+  const [repoContent, setRepoContent] = useState([]);
+  const [selectedFilesInParent, setSelectedFilesInParent] = useState([]);
 
   // Get Project Information
   useEffect(() => {
@@ -63,10 +71,27 @@ const Processing = () => {
   };
 
   // Get the Repo Information
-  const handleRepoSelection = (repoFullName, token) => {
+  const handleRepoSelection = async (repoFullName, token) => {
     console.log("Selected repository:", repoFullName);
     setSelectedRepo(repoFullName);
     setGithubAccessToken(token);
+
+    const url = `https://api.github.com/repos/${repoFullName}/contents`;
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch repository contents");
+      }
+      const contentData = await response.json();
+      setRepoContent(contentData);
+    } catch (error) {
+      console.error("Error fetching repository contents:", error);
+      setRepoContent([]);
+    }
   };
 
   // Get Access Token
@@ -88,6 +113,11 @@ const Processing = () => {
     return () => unsubscribe();
   }, [router]);
 
+  // Open File Selector
+  const toggleFileSelector = () => {
+    setIsFileSelectorOpen(!isFileSelectorOpen);
+  };
+
   // Trigger Integration
   const handleInputSubmit = async () => {
     setIsLoading(true);
@@ -100,6 +130,8 @@ const Processing = () => {
     // Extract projectId from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const session_id = urlParams.get("projectId");
+    const selectedFileNames = selectedFilesInParent.map((file) => file.name);
+    const selectedFileURLs = selectedFilesInParent.map((file) => file.git_url);
 
     const payload = {
       session_id,
@@ -108,6 +140,9 @@ const Processing = () => {
       docslink: docsLink,
       vertical: vertical,
       repo: selectedRepo,
+      project: projectId,
+      suggested_files: selectedFileNames,
+      suggested_file_urls: selectedFileURLs,
     };
 
     console.log("Submitting user input:", userInput);
@@ -256,6 +291,11 @@ const Processing = () => {
     }
   };
 
+  // Handle Selected File
+  const handleSelectedFiles = (selectedFiles) => {
+    setSelectedFilesInParent(selectedFiles);
+  };
+
   return (
     <div className="bg-white w-full h-full">
       <Navbar2 />
@@ -274,6 +314,7 @@ const Processing = () => {
           setFileContent={setFileContent}
           onRepoSelect={handleRepoSelection}
         />
+        {/* Header Buttons */}
         <div className="my-4 flex w-full items-center flex-row justify-between">
           {/* <input
             type="text"
@@ -282,7 +323,23 @@ const Processing = () => {
             placeholder="Type your request here"
             className="border-2 border-gray-300 rounded-lg p-2 w-full"
           /> */}
-          {agentResponse.step === 7 ? (
+          {selectedFilesInParent.length > 0 ? (
+            <button
+              onClick={handleInputSubmit}
+              className="mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg bg-green-500 text-white hover:bg-green-700"
+            >
+              <FontAwesomeIcon icon={faPlay} />
+              Continue
+            </button>
+          ) : selectedRepo ? (
+            <button
+              onClick={toggleFileSelector}
+              className="mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-700"
+            >
+              <FontAwesomeIcon icon={faHandPointer} />
+              Select files
+            </button>
+          ) : agentResponse.step === 7 ? (
             <button
               onClick={handleFinalStep}
               className="mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg bg-green-500 text-white"
@@ -296,7 +353,7 @@ const Processing = () => {
               disabled={!selectedRepo}
               className={`mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg ${
                 selectedRepo
-                  ? "bg-green-500 text-white standard-button"
+                  ? "bg-green-500 text-white hover:bg-green-700 standard-button"
                   : "bg-gray-400 text-gray-200 cursor-not-allowed"
               }`}
             >
@@ -345,40 +402,36 @@ const Processing = () => {
             </div>
           ) : (
             <div>
-              {agentResponse.content ? (
-                agentResponse.step === 1 ? (
-                  <div>
-                    <OurProcess
-                      isRepoSelected={!!selectedRepo}
-                      currentStep={agentResponse.step}
-                    />
-                    <p className="text-xl text-center p-4 m-4 bg-white">
-                      We&apos;ve analysed your codebase! Looks like its these
-                      files we need to work on 🤔
-                    </p>
-                    <div className="m-4">
-                      <p className="font-semibold py-2">
-                        Press Continue to proceed to the next step
-                      </p>
-                      <ul>
-                        {agentResponse.content
-                          .split("\n")
-                          .map((file, index) => (
-                            <li
-                              key={index}
-                              className="p-2 flex w-fit items-center text-lg gap-2 border bg-white rounded-md mb-2"
-                            >
-                              <FontAwesomeIcon
-                                className="text-gray-600 text-xs"
-                                icon={faFile}
-                              />
-                              {file}
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
+              {selectedFilesInParent.length > 0 ? (
+                <div>
+                  <OurProcess
+                    isRepoSelected={!!selectedRepo}
+                    currentStep={agentResponse.step}
+                    filesSelected={selectedFilesInParent.length > 0}
+                  />
+                  <p className="text-xl text-center p-4 m-4 bg-white">
+                    Here are the files you've selected for integration:
+                  </p>
+                  <div className="m-4">
+                    <ul>
+                      {selectedFilesInParent.map((file, index) => (
+                        <li
+                          key={index}
+                          className="p-2 flex w-fit items-center text-lg gap-2 border bg-white rounded-md mb-2"
+                        >
+                          <FontAwesomeIcon
+                            className="text-gray-600 text-xs"
+                            icon={faFile}
+                          />
+                          {file.name}{" "}
+                          {/* Assuming each file object has a name property */}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                ) : agentResponse.step === 2 ? (
+                </div>
+              ) : agentResponse.content ? (
+                agentResponse.step === 2 ? (
                   <div>
                     <OurProcess
                       isRepoSelected={!!selectedRepo}
@@ -467,9 +520,9 @@ const Processing = () => {
                   </div>
                 ) : null
               ) : selectedRepo ? (
-                <div>
+                <div className="flex flex-col items-center justify-center pb-4">
                   <OurProcess isRepoSelected={!!selectedRepo} />
-                  <p className="text-xl text-center p-4 m-4 bg-white">
+                  <p className="text-xl text-center gap-4 p-4 m-4 bg-white">
                     Integrating{" "}
                     <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
                       {projectName}
@@ -477,9 +530,19 @@ const Processing = () => {
                     into{" "}
                     <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
                       {selectedRepo}
-                    </span>
-                    {" "}🎉
+                    </span>{" "}
+                    🎉
+                    <p className="mt-4">Select your files!</p>
                   </p>
+                  {isFileSelectorOpen && (
+                    <FileSelector
+                      isOpen={isFileSelectorOpen}
+                      toggleFileSelector={toggleFileSelector}
+                      selectedRepo={selectedRepo}
+                      githubAccessToken={githubAccessToken}
+                      onSave={handleSelectedFiles}
+                    />
+                  )}
                 </div>
               ) : (
                 <div>
