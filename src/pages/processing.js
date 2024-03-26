@@ -368,194 +368,230 @@ const Processing = () => {
           {isLoading ? (
             <div>
               <OurProcess
-                isRepoSelected={!!selectedRepo}
-                currentStep={agentResponse.step}
+               isRepoSelected={!!selectedRepo}
+               currentStep={agentResponse.step}
+               filesSelected={selectedFilesInParent.length > 0}
+               finalStep={finalStep}
               />
               <div className="flex justify-center flex-col py-8 items-center h-full">
                 <div className="loader"></div>
               </div>
             </div>
-          ) : finalStep ? (
+          ) : (
             <div>
               <OurProcess
                 isRepoSelected={!!selectedRepo}
                 currentStep={agentResponse.step}
+                filesSelected={selectedFilesInParent.length > 0}
                 finalStep={finalStep}
               />
-              <div className="bg-white p-4 m-4 flex items-center flex-col justify-center">
-                <p className="text-xl text-center p-4 m-4 bg-white">
-                  Now all thats left is to create a new branch with your
-                  integration, run, and test it. ▶️
-                </p>
-                <button
-                  onClick={createNewBranch}
-                  disabled={!agentResponse.step === 1 || branchCreated}
-                  className={`mt-2 px-4 py-2 flex  items-center gap-2 rounded-lg ${
-                    agentResponse
-                      ? "bg-blue-500 text-white standard-button"
-                      : "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  }`}
-                >
-                  {branchCreated ? "Branch Created!" : "Create New Branch"}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div>
-              {selectedFilesInParent.length > 0 ? (
-                <div>
-                  <OurProcess
-                    isRepoSelected={!!selectedRepo}
-                    currentStep={agentResponse.step}
-                    filesSelected={selectedFilesInParent.length > 0}
-                  />
-                  <p className="text-xl text-center p-4 m-4 bg-white">
-                    Here are the files you've selected for integration:
-                  </p>
-                  <div className="m-4">
-                    <ul>
-                      {selectedFilesInParent.map((file, index) => (
-                        <li
-                          key={index}
-                          className="p-2 flex w-fit items-center text-lg gap-2 border bg-white rounded-md mb-2"
+              {(() => {
+                if (finalStep) {
+                  return (
+                    <div>
+                      {/* <OurProcess
+                        isRepoSelected={!!selectedRepo}
+                        currentStep={agentResponse.step}
+                        finalStep={finalStep}
+                      /> */}
+                      <div className="bg-white p-4 m-4 flex items-center flex-col justify-center">
+                        <p className="text-xl text-center p-4 m-4 bg-white">
+                          Now all thats left is to create a new branch with your
+                          integration, run, and test it. ▶️
+                        </p>
+                        <button
+                          onClick={createNewBranch}
+                          disabled={!agentResponse.step === 1 || branchCreated}
+                          className={`mt-2 px-4 py-2 flex  items-center gap-2 rounded-lg ${
+                            agentResponse
+                              ? "bg-blue-500 text-white standard-button"
+                              : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                          }`}
                         >
-                          <FontAwesomeIcon
-                            className="text-gray-600 text-xs"
-                            icon={faFile}
-                          />
-                          {file.name}{" "}
-                          {/* Assuming each file object has a name property */}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ) : agentResponse.content ? (
-                agentResponse.step === 2 ? (
-                  <div>
-                    <OurProcess
-                      isRepoSelected={!!selectedRepo}
-                      currentStep={agentResponse.step}
-                    />
-                    <p className="text-xl text-center p-4 m-4 bg-white">
-                      To get started, we have created the functions for your
-                      integration. Next, we will create the UI elements.
-                    </p>
-                    <pre className="preStyle m-4 p-4">
-                      {agentResponse.content}
-                    </pre>
-                  </div>
-                ) : agentResponse.step === 3 ? (
-                  <div>
-                    <OurProcess
-                      isRepoSelected={!!selectedRepo}
-                      currentStep={agentResponse.step}
-                    />
-                    <p className="text-xl text-center p-4 m-4 bg-white">
-                      Great! We&apos;ve proposed updates for your UI components
-                      based on the integration. Here&apos;s what you can add or
-                      update:
-                    </p>
-                    <pre className="preStyle m-4 p-4">
-                      {agentResponse.content}
-                    </pre>
-                  </div>
-                ) : agentResponse.step === 4 ? (
-                  <div>
-                    <OurProcess
-                      isRepoSelected={!!selectedRepo}
-                      currentStep={agentResponse.step}
-                    />
-                    <p className="text-xl text-center p-4 m-4 bg-white">
-                      We&apos;ve identified the backend endpoints that need to
-                      be created or updated. Here are the proposed backend
-                      endpoints for your integration:
-                    </p>
-                    <pre className="preStyle m-4 p-4">
-                      {agentResponse.content}
-                    </pre>
-                  </div>
-                ) : agentResponse.step === 5 ? (
-                  <div>
-                    <OurProcess
-                      isRepoSelected={!!selectedRepo}
-                      currentStep={agentResponse.step}
-                    />
-                    <p className="text-xl text-center p-4 m-4 bg-white">
-                      Make sure you have your API Key and have placed it in your
-                      environment variables!
-                    </p>
-                    <pre className="preStyle m-4 p-4">
-                      {agentResponse.content}
-                    </pre>
-                  </div>
-                ) : agentResponse.step === 6 ? (
-                  <div>
-                    <OurProcess
-                      isRepoSelected={!!selectedRepo}
-                      currentStep={agentResponse.step}
-                    />
-                    <p className="text-xl text-center p-4 m-4 bg-white">
-                      We have created integration tests that you can run to
-                      check the status of your integration.
-                    </p>
-                    <pre className="preStyle m-4 p-4">
-                      {agentResponse.content}
-                    </pre>
-                  </div>
-                ) : agentResponse.step === 7 ? (
-                  <div>
-                    <OurProcess
-                      isRepoSelected={!!selectedRepo}
-                      currentStep={agentResponse.step}
-                    />
-                    <p className="text-xl text-center p-4 m-4 bg-white">
-                      Based on your codebase, here are a list of things that may
-                      be impacted by this integration. Select the ones you want
-                      us to refactor to incorporate your new API integration.
-                    </p>
-                    <pre className="preStyle m-4 p-4">
-                      {agentResponse.content}
-                    </pre>
-                  </div>
-                ) : null
-              ) : selectedRepo ? (
-                <div className="flex flex-col items-center justify-center pb-4">
-                  <OurProcess isRepoSelected={!!selectedRepo} />
-                  <p className="text-xl text-center gap-4 p-4 m-4 bg-white">
-                    Integrating{" "}
-                    <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
-                      {projectName}
-                    </span>{" "}
-                    into{" "}
-                    <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
-                      {selectedRepo}
-                    </span>{" "}
-                    🎉
-                    <p className="mt-4">Select your files!</p>
-                  </p>
-                  {isFileSelectorOpen && (
-                    <FileSelector
-                      isOpen={isFileSelectorOpen}
-                      toggleFileSelector={toggleFileSelector}
-                      selectedRepo={selectedRepo}
-                      githubAccessToken={githubAccessToken}
-                      onSave={handleSelectedFiles}
-                    />
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <OurProcess />
-                  <p className="text-xl text-center p-4 m-4 bg-white">
-                    Select a Repository to integrate with the{" "}
-                    <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
-                      {projectName}
-                    </span>{" "}
-                    API, and let&apos;s get started!🖱️
-                  </p>
-                </div>
-              )}
+                          {branchCreated
+                            ? "Branch Created!"
+                            : "Create New Branch"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                } else if (agentResponse.step >= 2 && agentResponse.step <= 7) {
+                  switch (agentResponse.step) {
+                    case 2:
+                      return (
+                        <div>
+                          {/* <OurProcess
+                            isRepoSelected={!!selectedRepo}
+                            currentStep={agentResponse.step}
+                          /> */}
+                          <p className="text-xl text-center p-4 m-4 bg-white">
+                            To get started, we have created the functions for
+                            your integration. Next, we will create the UI
+                            elements.
+                          </p>
+                          <pre className="preStyle m-4 p-4">
+                            {agentResponse.content}
+                          </pre>
+                        </div>
+                      );
+                    case 3:
+                      return (
+                        <div>
+                          {/* <OurProcess
+                            isRepoSelected={!!selectedRepo}
+                            currentStep={agentResponse.step}
+                          /> */}
+                          <p className="text-xl text-center p-4 m-4 bg-white">
+                            Great! We&apos;ve proposed updates for your UI
+                            components based on the integration. Here&apos;s
+                            what you can add or update:
+                          </p>
+                          <pre className="preStyle m-4 p-4">
+                            {agentResponse.content}
+                          </pre>
+                        </div>
+                      );
+                    case 4:
+                      return (
+                        <div>
+                          {/* <OurProcess
+                            isRepoSelected={!!selectedRepo}
+                            currentStep={agentResponse.step}
+                          /> */}
+                          <p className="text-xl text-center p-4 m-4 bg-white">
+                            We&apos;ve identified the backend endpoints that
+                            need to be created or updated. Here are the proposed
+                            backend endpoints for your integration:
+                          </p>
+                          <pre className="preStyle m-4 p-4">
+                            {agentResponse.content}
+                          </pre>
+                        </div>
+                      );
+                    case 5:
+                      return (
+                        <div>
+                          {/* <OurProcess
+                            isRepoSelected={!!selectedRepo}
+                            currentStep={agentResponse.step}
+                          /> */}
+                          <p className="text-xl text-center p-4 m-4 bg-white">
+                            Make sure you have your API Key and have placed it
+                            in your environment variables!
+                          </p>
+                          <pre className="preStyle m-4 p-4">
+                            {agentResponse.content}
+                          </pre>
+                        </div>
+                      );
+                    case 6:
+                      return (
+                        <div>
+                          {/* <OurProcess
+                            isRepoSelected={!!selectedRepo}
+                            currentStep={agentResponse.step}
+                          /> */}
+                          <p className="text-xl text-center p-4 m-4 bg-white">
+                            We have created integration tests that you can run
+                            to check the status of your integration.
+                          </p>
+                          <pre className="preStyle m-4 p-4">
+                            {agentResponse.content}
+                          </pre>
+                        </div>
+                      );
+                    case 7:
+                      return (
+                        <div>
+                          {/* <OurProcess
+                            isRepoSelected={!!selectedRepo}
+                            currentStep={agentResponse.step}
+                          /> */}
+                          <p className="text-xl text-center p-4 m-4 bg-white">
+                            Based on your codebase, here are a list of things
+                            that may be impacted by this integration. Select the
+                            ones you want us to refactor to incorporate your new
+                            API integration.
+                          </p>
+                          <pre className="preStyle m-4 p-4">
+                            {agentResponse.content}
+                          </pre>
+                        </div>
+                      );
+                    default:
+                      return null;
+                  }
+                } else if (selectedFilesInParent.length > 0) {
+                  return (
+                    <div>
+                      {/* <OurProcess
+                        isRepoSelected={!!selectedRepo}
+                        currentStep={agentResponse.step}
+                        filesSelected={selectedFilesInParent.length > 0}
+                      /> */}
+                      <p className="text-xl text-center p-4 m-4 bg-white">
+                        Here are the files you have selected for integration:
+                      </p>
+                      <div className="m-4">
+                        <ul>
+                          {selectedFilesInParent.map((file, index) => (
+                            <li
+                              key={index}
+                              className="p-2 flex w-fit items-center text-lg gap-2 border bg-white rounded-md mb-2"
+                            >
+                              <FontAwesomeIcon
+                                className="text-gray-600 text-xs"
+                                icon={faFile}
+                              />
+                              {file.name}{" "}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  );
+                } else if (selectedRepo) {
+                  return (
+                    <div className="flex flex-col items-center justify-center pb-4">
+                      {/* <OurProcess isRepoSelected={!!selectedRepo} /> */}
+                      <div className="text-xl text-center gap-4 p-4 m-4 bg-white">
+                        Integrating{" "}
+                        <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
+                          {projectName}
+                        </span>{" "}
+                        into{" "}
+                        <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
+                          {selectedRepo}
+                        </span>{" "}
+                        🎉
+                        <p className="mt-4">Select your files!</p>
+                      </div>
+                      {isFileSelectorOpen && (
+                        <FileSelector
+                          isOpen={isFileSelectorOpen}
+                          toggleFileSelector={toggleFileSelector}
+                          selectedRepo={selectedRepo}
+                          githubAccessToken={githubAccessToken}
+                          onSave={handleSelectedFiles}
+                        />
+                      )}
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div>
+                      {/* <OurProcess /> */}
+                      <p className="text-xl text-center p-4 m-4 bg-white">
+                        Select a Repository to integrate with the{" "}
+                        <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
+                          {projectName}
+                        </span>{" "}
+                        API, and let&apos;s get started!🖱️
+                      </p>
+                    </div>
+                  );
+                }
+              })()}
             </div>
           )}
         </div>

@@ -37,7 +37,6 @@ const OurProcess = ({
           <FontAwesomeIcon
             className={`text-${
               currentStep === 2 ||
-              filesSelected ||
               currentStep === 3 ||
               currentStep === 4 ||
               currentStep === 5 ||
