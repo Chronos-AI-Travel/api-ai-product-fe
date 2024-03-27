@@ -6,8 +6,8 @@ import { db } from "../../app/utils/firebaseConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
-const RepositorySelector = ({ setFileContent, onRepoSelect }) => {
-  const [selectedRepo, setSelectedRepo] = useState("");
+const RepositorySelector = ({ setFileContent, onRepoSelect, selectedRepo, setSelectedRepo }) => {
+  // const [selectedRepo, setSelectedRepo] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userUid, setUserUid] = useState(null);
   const [repos, setRepos] = useState([]);

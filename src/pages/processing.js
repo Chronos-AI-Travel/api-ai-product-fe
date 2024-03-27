@@ -16,7 +16,7 @@ import IntegrationButton from "../app/components/IntegrationButton";
 const Processing = () => {
   const [projectName, setProjectName] = useState("");
   const [userInput, setUserInput] = useState("");
-  const [agentResponse, setAgentResponse] = useState({ step: null });
+  const [agentResponse, setAgentResponse] = useState({ step: "" });
   const [fileContent, setFileContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -36,15 +36,33 @@ const Processing = () => {
 
   // Get Project Information
   useEffect(() => {
+    console.log("useEffect triggered with projectId:", projectId);
+
     const fetchProject = async () => {
       if (!projectId) return;
+      console.log("Fetching project data for projectId:", projectId);
+
       const docRef = doc(db, "projects", projectId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setProjectName(docSnap.data().providerName);
-        const providerID = docSnap.data().providerID;
-        setStatus(docSnap.data().status);
+        console.log("Project data found:", docSnap.data());
+
+        const projectData = docSnap.data();
+        console.log("Project step:", projectData.step);
+        setProjectName(projectData.providerName);
+        const providerID = projectData.providerID;
+        setStatus(projectData.status);
+        if (projectData.selectedRepo) {
+          setSelectedRepo(projectData.selectedRepo);
+        }
+        if (projectData.step !== undefined) {
+          console.log("Setting agentResponse.step to:", projectData.step);
+          setAgentResponse((prevState) => ({
+            ...prevState,
+            step: projectData.step,
+          }));
+        }
 
         const providerRef = doc(db, "providers", providerID);
         const providerSnap = await getDoc(providerRef);
@@ -89,7 +107,6 @@ const Processing = () => {
     updateProjectStep();
   }, [agentResponse.step, projectId]);
 
-  // Get the Repo Information
   const handleRepoSelection = async (repoFullName, token) => {
     console.log("Selected repository:", repoFullName);
     setSelectedRepo(repoFullName);
@@ -107,8 +124,15 @@ const Processing = () => {
       }
       const contentData = await response.json();
       setRepoContent(contentData);
+
+      // Assuming projectId is available in your component's state or props
+      const projectRef = doc(db, "projects", projectId);
+      await updateDoc(projectRef, {
+        selectedRepo: repoFullName, // Update the selectedRepo field in Firestore
+      });
+      console.log("Updated selectedRepo in Firestore");
     } catch (error) {
-      console.error("Error fetching repository contents:", error);
+      console.error("Error:", error);
       setRepoContent([]);
     }
   };
@@ -354,6 +378,8 @@ const Processing = () => {
             <RepositorySelector
               setFileContent={setFileContent}
               onRepoSelect={handleRepoSelection}
+              selectedRepo={selectedRepo}
+              setSelectedRepo={setSelectedRepo}
             />
             <IntegrationButton
               selectedFilesInParent={selectedFilesInParent}
