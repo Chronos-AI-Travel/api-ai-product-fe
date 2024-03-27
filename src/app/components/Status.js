@@ -56,7 +56,7 @@ const Status = ({ projectId, status, updateStatus }) => {
     <div className="border-2 w-48 rounded-lg bg-white p-2 relative">
       <div
         onClick={toggleDropdown}
-        className="flex cursor-pointer items-center bg-white justify-between"
+        className="flex cursor-pointer items-center text-sm bg-white justify-between"
       >
         <span>
           {status}

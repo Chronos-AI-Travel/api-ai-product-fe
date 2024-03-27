@@ -8,7 +8,7 @@ const OurProcess = ({
   filesSelected,
 }) => {
   return (
-    <div className="py-1 text-gray-800 bg-gray-500 rounded-t-md">
+    <div className="py-1 overflow-x-auto text-gray-800 bg-gray-500 rounded-t-md">
       <ol className="text-sm flex text-xs p-2 flex-row gap-2 w-full">
         <li className="rounded-lg border flex bg-white text-gray-900 p-2 w-auto">
           Choose API

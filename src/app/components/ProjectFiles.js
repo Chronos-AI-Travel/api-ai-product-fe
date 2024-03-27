@@ -1,57 +1,57 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../utils/firebaseConfig"; // Adjust the import path as necessary
-import { collection, query, where, getDocs, doc } from "firebase/firestore";
+import { db } from "../utils/firebaseConfig";
+import { collection, query, where, onSnapshot, doc } from "firebase/firestore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
   faChevronUp,
-  faFileCirclePlus,
   faFileLines,
-  faFolderTree,
 } from "@fortawesome/free-solid-svg-icons";
 
-const ProjectFiles = ({ projectId }) => {
-  const [files, setFiles] = useState([]);
-  const [isOpen, setIsOpen] = useState(false); // State to manage dropdown open/close
+const ProjectFiles = ({ projectId, files, setFiles }) => {
+  // const [files, setFiles] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const fetchProjectFiles = async () => {
-      if (!projectId) return;
-      const projectRef = doc(db, "projects", projectId);
-      const q = query(
-        collection(db, "projectFiles"),
-        where("project", "==", projectRef)
-      );
-      const querySnapshot = await getDocs(q);
+    if (!projectId) return;
+
+    const projectRef = doc(db, "projects", projectId);
+    const q = query(
+      collection(db, "projectFiles"),
+      where("project", "==", projectRef)
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const filesArray = [];
       querySnapshot.forEach((doc) => {
         filesArray.push({ id: doc.id, ...doc.data() });
       });
       setFiles(filesArray);
-    };
+    });
 
-    fetchProjectFiles();
+    return () => unsubscribe();
   }, [projectId]);
 
   return (
-    <div
-      onClick={() => setIsOpen(!isOpen)}
-      className="border-2 bg-white w-48 mt-2 overflow-hidden rounded-lg p-2 absolute"
-    >
-      <div className="flex justify-between items-center cursor-pointer">
-        <p className="">
+    <div className="border-2 w-48 mt-2 bg-white overflow-hidden rounded-lg p-2 absolute z-8">
+      <div
+        className="flex justify-between flex-row items-center cursor-pointer"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="text-sm flex flex-row items-center gap-2">
           <FontAwesomeIcon
-            className="text-gray-400 text-xs mr-2"
             icon={faFileLines}
+            className="text-gray-500 flex items-center text-xs"
           />
           Project Files
-        </p>
+          <div className="border py-1 px-2.5 rounded-full">{files.length}</div>
+        </div>
         <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} />
       </div>
       {isOpen && (
-        <ul className="text-xs mt-2">
+        <ul className="text-xs">
           {files.map((file) => (
-            <li className="py-1 border-b" key={file.id}>
+            <li className="py-1" key={file.id}>
               {file.name}
             </li>
           ))}

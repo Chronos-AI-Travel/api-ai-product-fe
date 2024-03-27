@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../app/utils/firebaseConfig";
 import Navbar2 from "../app/components/navigation/Navbar2";
 import RepositorySelector from "../app/components/RepositorySelector";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFile,
-  faHandPointer,
-  faPlay,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faFile } from "@fortawesome/free-solid-svg-icons";
 import OurProcess from "../app/components/OurProcess";
 import Status from "../app/components/Status";
 import ProjectFiles from "../app/components/ProjectFiles";
@@ -20,7 +16,7 @@ import IntegrationButton from "../app/components/IntegrationButton";
 const Processing = () => {
   const [projectName, setProjectName] = useState("");
   const [userInput, setUserInput] = useState("");
-  const [agentResponse, setAgentResponse] = useState("");
+  const [agentResponse, setAgentResponse] = useState({ step: null });
   const [fileContent, setFileContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -35,6 +31,8 @@ const Processing = () => {
   const [isFileSelectorOpen, setIsFileSelectorOpen] = useState(false);
   const [repoContent, setRepoContent] = useState([]);
   const [selectedFilesInParent, setSelectedFilesInParent] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [branchName, setBranchName] = useState("");
 
   // Get Project Information
   useEffect(() => {
@@ -71,6 +69,25 @@ const Processing = () => {
   const updateStatus = (newStatus) => {
     setStatus(newStatus);
   };
+
+  // Update Step
+  useEffect(() => {
+    const updateProjectStep = async () => {
+      if (!projectId || agentResponse.step === undefined) return;
+
+      const projectRef = doc(db, "projects", projectId);
+
+      try {
+        await updateDoc(projectRef, {
+          step: agentResponse.step,
+        });
+      } catch (error) {
+        console.error("Error updating project step:", error);
+      }
+    };
+
+    updateProjectStep();
+  }, [agentResponse.step, projectId]);
 
   // Get the Repo Information
   const handleRepoSelection = async (repoFullName, token) => {
@@ -123,7 +140,6 @@ const Processing = () => {
   // Trigger Integration
   const handleInputSubmit = async () => {
     setIsLoading(true);
-
     const baseUrl =
       window.location.hostname === "localhost"
         ? "http://localhost:8000"
@@ -168,6 +184,7 @@ const Processing = () => {
       if (data.step === 1) {
         console.log("Suggested files:", data.suggested_files);
         setAgentResponse({ content: data.suggested_files, step: data.step });
+        console.log("Updated agentResponse state:", agentResponse);
       } else {
         setAgentResponse({ content: data.output, step: data.step });
       }
@@ -186,6 +203,7 @@ const Processing = () => {
 
   // Create New Branch
   const createNewBranch = async () => {
+    console.log("files", files);
     const ownerRepo = selectedRepo.split("/");
     const owner = ownerRepo[0];
     const repo = ownerRepo[1];
@@ -204,6 +222,7 @@ const Processing = () => {
       const branchNames = branches.map((branch) => branch.name);
       let branchNumber = 1;
       let newBranchName = `chronos-integration-${branchNumber}`;
+      setBranchName(newBranchName);
       while (branchNames.includes(newBranchName)) {
         branchNumber++;
         newBranchName = `chronos-integration-${branchNumber}`;
@@ -237,52 +256,54 @@ const Processing = () => {
       if (createBranchResponse.ok) {
         console.log(`Branch ${newBranchName} created successfully.`);
         setBranchCreated(true);
-        let fileName = agentResponse.split("\n")[0];
-        fileName = fileName.replace(/<[^>]+>/g, "");
-        const fileContent = agentResponse.substring(
-          agentResponse.indexOf("\n") + 1
-        );
-        const contentBase64 = btoa(unescape(encodeURIComponent(fileContent)));
-        const fileExistsResponse = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}?ref=${newBranchName}`,
-          {
-            headers: {
-              Authorization: `Bearer ${githubAccessToken}`,
-              Accept: "application/vnd.github.v3+json",
-            },
-          }
-        );
 
-        let sha = "";
-        if (fileExistsResponse.status === 200) {
-          const fileData = await fileExistsResponse.json();
-          sha = fileData.sha;
-        }
+        for (const file of files) {
+          let fileName = file.name;
+          const fileContent = file.code;
+          const contentBase64 = btoa(unescape(encodeURIComponent(fileContent)));
 
-        const createOrUpdateFileResponse = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${githubAccessToken}`,
-              Accept: "application/vnd.github.v3+json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              message: `Create or update ${fileName}`,
-              content: contentBase64,
-              branch: newBranchName,
-              sha: sha,
-            }),
-          }
-        );
-
-        if (createOrUpdateFileResponse.ok) {
-          console.log(
-            `${fileName} created or updated successfully in ${newBranchName} branch.`
+          const fileExistsResponse = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}?ref=${newBranchName}`,
+            {
+              headers: {
+                Authorization: `Bearer ${githubAccessToken}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
           );
-        } else {
-          console.error(`Failed to create or update ${fileName}.`);
+
+          let sha = "";
+          if (fileExistsResponse.status === 200) {
+            const fileData = await fileExistsResponse.json();
+            sha = fileData.sha;
+          }
+
+          // Create or update the file in the new branch
+          const createOrUpdateFileResponse = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}`,
+            {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${githubAccessToken}`,
+                Accept: "application/vnd.github.v3+json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                message: `Create or update ${fileName}`,
+                content: contentBase64,
+                branch: newBranchName,
+                sha: sha, // This will be empty if the file does not exist, which is fine
+              }),
+            }
+          );
+
+          if (createOrUpdateFileResponse.ok) {
+            console.log(
+              `${fileName} created or updated successfully in ${newBranchName} branch.`
+            );
+          } else {
+            console.error(`Failed to create or update ${fileName}.`);
+          }
         }
       } else {
         console.error("Failed to create the branch.");
@@ -307,6 +328,19 @@ const Processing = () => {
     return items;
   };
 
+  // Copy to Clipboard
+  const copyToClipboard = () => {
+    const command = `git checkout ${branchName} && git pull origin ${branchName}`;
+    navigator.clipboard.writeText(command).then(
+      () => {
+        console.log("Command copied to clipboard");
+      },
+      (err) => {
+        console.error("Could not copy command to clipboard", err);
+      }
+    );
+  };
+
   return (
     <div className="bg-white w-full h-full">
       <Navbar2 />
@@ -328,6 +362,9 @@ const Processing = () => {
               handleInputSubmit={handleInputSubmit}
               toggleFileSelector={toggleFileSelector}
               handleFinalStep={handleFinalStep}
+              finalStep={finalStep}
+              createNewBranch={createNewBranch}
+              branchCreated={branchCreated}
             />
           </div>
           <div>
@@ -336,9 +373,14 @@ const Processing = () => {
               status={status}
               updateStatus={updateStatus}
             />
-            <ProjectFiles projectId={projectId} />
+            <ProjectFiles
+              projectId={projectId}
+              setFiles={setFiles}
+              files={files}
+            />
           </div>
         </div>
+        {/* Input Field */}
         <div className="my-4 flex w-full items-center flex-row justify-between">
           {/* <input
             type="text"
@@ -373,30 +415,30 @@ const Processing = () => {
                 if (finalStep) {
                   return (
                     <div>
-                      {/* <OurProcess
-                        isRepoSelected={!!selectedRepo}
-                        currentStep={agentResponse.step}
-                        finalStep={finalStep}
-                      /> */}
-                      <div className="bg-white p-4 m-4 flex items-center flex-col justify-center">
-                        <p className="text-xl text-center p-4 m-4 bg-white">
-                          Now all thats left is to create a new branch with your
-                          integration, run, and test it. ▶️
-                        </p>
-                        <button
-                          onClick={createNewBranch}
-                          disabled={!agentResponse.step === 1 || branchCreated}
-                          className={`mt-2 px-4 py-2 flex  items-center gap-2 rounded-lg ${
-                            agentResponse
-                              ? "bg-blue-500 text-white standard-button"
-                              : "bg-gray-400 text-gray-200 cursor-not-allowed"
-                          }`}
-                        >
-                          {branchCreated
-                            ? "Branch Created!"
-                            : "Create New Branch"}
-                        </button>
-                      </div>
+                      {!branchCreated ? (
+                        <div className="bg-white p-4 m-4 flex items-center flex-col justify-center">
+                          <p className="text-xl text-center p-4 m-4 bg-white">
+                            Now all thats left is to create a new branch with
+                            your integration, run, and test it. ▶️
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="bg-green-500  p-4 m-4 flex items-center text-white flex-col justify-center">
+                          <div className="text-3xl font-semibold text-center p-4 m-4 text-white">
+                            Branch Created! 🎉{" "}
+                            <p className="text-lg font-normal">{branchName}</p>
+                          </div>
+                          <p className=" bg-gray-300 flex items-center gap-2 text-black py-2 px-2 rounded-md">
+                            git checkout {branchName} && git pull origin{" "}
+                            {branchName}
+                            <FontAwesomeIcon
+                              className="p-2 rounded-full bg-white hover:bg-gray-100 cursor-pointer"
+                              icon={faCopy}
+                              onClick={copyToClipboard}
+                            />
+                          </p>
+                        </div>
+                      )}
                     </div>
                   );
                 } else if (agentResponse.step >= 2 && agentResponse.step <= 7) {
@@ -404,10 +446,6 @@ const Processing = () => {
                     case 2:
                       return (
                         <div>
-                          {/* <OurProcess
-                            isRepoSelected={!!selectedRepo}
-                            currentStep={agentResponse.step}
-                          /> */}
                           <p className="text-xl text-center p-4 m-4 bg-white">
                             To get started, we have created the functions for
                             your integration. Next, we will create the UI
@@ -421,10 +459,6 @@ const Processing = () => {
                     case 3:
                       return (
                         <div>
-                          {/* <OurProcess
-                            isRepoSelected={!!selectedRepo}
-                            currentStep={agentResponse.step}
-                          /> */}
                           <p className="text-xl text-center p-4 m-4 bg-white">
                             Great! We&apos;ve proposed updates for your UI
                             components based on the integration. Here&apos;s
@@ -438,10 +472,6 @@ const Processing = () => {
                     case 4:
                       return (
                         <div>
-                          {/* <OurProcess
-                            isRepoSelected={!!selectedRepo}
-                            currentStep={agentResponse.step}
-                          /> */}
                           <p className="text-xl text-center p-4 m-4 bg-white">
                             We&apos;ve identified the backend endpoints that
                             need to be created or updated. Here are the proposed
@@ -455,10 +485,6 @@ const Processing = () => {
                     case 5:
                       return (
                         <div>
-                          {/* <OurProcess
-                            isRepoSelected={!!selectedRepo}
-                            currentStep={agentResponse.step}
-                          /> */}
                           <p className="text-xl text-center p-4 m-4 bg-white">
                             Make sure you have your API Key and have placed it
                             in your environment variables!
@@ -484,10 +510,6 @@ const Processing = () => {
                     case 6:
                       return (
                         <div>
-                          {/* <OurProcess
-                            isRepoSelected={!!selectedRepo}
-                            currentStep={agentResponse.step}
-                          /> */}
                           <p className="text-xl text-center p-4 m-4 bg-white">
                             We have created integration tests that you can run
                             to check the status of your integration.
@@ -500,19 +522,25 @@ const Processing = () => {
                     case 7:
                       return (
                         <div>
-                          {/* <OurProcess
-                            isRepoSelected={!!selectedRepo}
-                            currentStep={agentResponse.step}
-                          /> */}
                           <p className="text-xl text-center p-4 m-4 bg-white">
                             Based on your codebase, here are a list of things
-                            that may be impacted by this integration. Select the
-                            ones you want us to refactor to incorporate your new
-                            API integration.
+                            that may be impacted by this integration. Consider
+                            these moving forward in your project.
                           </p>
-                          <pre className="preStyle m-4 p-4">
-                            {agentResponse.content}
-                          </pre>
+                          {agentResponse.content && (
+                            <ul className="border-2 p-2 bg-white rounded-lg">
+                              {processContentToListItems(
+                                agentResponse.content
+                              ).map((item, index) => (
+                                <li
+                                  className="border-b p-2 rounded-lg"
+                                  key={index}
+                                >
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       );
                     default:
@@ -521,11 +549,6 @@ const Processing = () => {
                 } else if (selectedFilesInParent.length > 0) {
                   return (
                     <div>
-                      {/* <OurProcess
-                        isRepoSelected={!!selectedRepo}
-                        currentStep={agentResponse.step}
-                        filesSelected={selectedFilesInParent.length > 0}
-                      /> */}
                       <p className="text-xl text-center p-4 m-4 bg-white">
                         Here are the files you have selected for integration:
                       </p>
@@ -550,7 +573,6 @@ const Processing = () => {
                 } else if (selectedRepo) {
                   return (
                     <div className="flex flex-col items-center justify-center pb-4">
-                      {/* <OurProcess isRepoSelected={!!selectedRepo} /> */}
                       <div className="text-xl text-center gap-4 p-4 m-4 bg-white">
                         Integrating{" "}
                         <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
@@ -577,7 +599,6 @@ const Processing = () => {
                 } else {
                   return (
                     <div>
-                      {/* <OurProcess /> */}
                       <p className="text-xl text-center p-4 m-4 bg-white">
                         Select a Repository to integrate with the{" "}
                         <span className="bg-blue-200 p-1 rounded-sm text-blue-600">
