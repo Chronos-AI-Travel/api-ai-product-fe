@@ -12,7 +12,6 @@ import { db } from "../../app/utils/firebaseConfig";
 
 const Status = ({ projectId, status, updateStatus }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   const setComplete = async () => {
@@ -54,8 +53,11 @@ const Status = ({ projectId, status, updateStatus }) => {
   };
 
   return (
-    <div className="border-2 w-48 rounded-lg p-2 relative">
-      <div className="flex items-center justify-between">
+    <div className="border-2 w-48 rounded-lg bg-white p-2 relative">
+      <div
+        onClick={toggleDropdown}
+        className="flex cursor-pointer items-center bg-white justify-between"
+      >
         <span>
           {status}
           {status === "In progress" && (
@@ -72,9 +74,9 @@ const Status = ({ projectId, status, updateStatus }) => {
         />
       </div>
       {isDropdownOpen && (
-        <div className="absolute right-0 mt-2 py-2 w-48 bg-white border rounded shadow-xl">
+        <div className="absolute right-0 mt-2 py-2 w-48 bg-white border rounded shadow-xl z-10">
           <button
-            className="block px-4 flex items-center justify-between py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            className="block px-4 bg-white flex items-center justify-between py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
             onClick={setInProgress}
           >
             Set to In Progress <FontAwesomeIcon icon={faPlay} />

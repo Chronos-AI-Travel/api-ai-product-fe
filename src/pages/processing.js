@@ -13,7 +13,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import OurProcess from "../app/components/OurProcess";
 import Status from "../app/components/Status";
+import ProjectFiles from "../app/components/ProjectFiles";
 import FileSelector from "../app/components/FileSelector";
+import IntegrationButton from "../app/components/IntegrationButton";
 
 const Processing = () => {
   const [projectName, setProjectName] = useState("");
@@ -296,25 +298,47 @@ const Processing = () => {
     setSelectedFilesInParent(selectedFiles);
   };
 
+  // Split List
+  const processContentToListItems = (content) => {
+    // Ensure content is treated as a string
+    const contentAsString = content.toString();
+    // Split content by looking for digits followed by a dot and space, capturing the split delimiters
+    const items = contentAsString.split(/(?=\d+\. )/);
+    return items;
+  };
+
   return (
     <div className="bg-white w-full h-full">
       <Navbar2 />
       <div className="flex min-h-screen w-full h-full items-start flex-col p-4">
-        <div className="flex w-full flex-row items-center justify-between">
-          <div className="font-light text-3xl mb-4">
-            {projectName || "Loading..."}
+        {/* Header */}
+        <div className="flex w-full flex-row items-start justify-between">
+          <div>
+            <div className="font-light text-3xl mb-4">
+              {projectName || "Loading..."}
+            </div>
+            <RepositorySelector
+              setFileContent={setFileContent}
+              onRepoSelect={handleRepoSelection}
+            />
+            <IntegrationButton
+              selectedFilesInParent={selectedFilesInParent}
+              selectedRepo={selectedRepo}
+              agentResponse={agentResponse}
+              handleInputSubmit={handleInputSubmit}
+              toggleFileSelector={toggleFileSelector}
+              handleFinalStep={handleFinalStep}
+            />
           </div>
-          <Status
-            projectId={projectId}
-            status={status}
-            updateStatus={updateStatus}
-          />
+          <div>
+            <Status
+              projectId={projectId}
+              status={status}
+              updateStatus={updateStatus}
+            />
+            <ProjectFiles projectId={projectId} />
+          </div>
         </div>
-        <RepositorySelector
-          setFileContent={setFileContent}
-          onRepoSelect={handleRepoSelection}
-        />
-        {/* Header Buttons */}
         <div className="my-4 flex w-full items-center flex-row justify-between">
           {/* <input
             type="text"
@@ -323,55 +347,15 @@ const Processing = () => {
             placeholder="Type your request here"
             className="border-2 border-gray-300 rounded-lg p-2 w-full"
           /> */}
-          {selectedFilesInParent.length > 0 ? (
-            <button
-              onClick={handleInputSubmit}
-              className="mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg bg-green-500 text-white hover:bg-green-700"
-            >
-              <FontAwesomeIcon icon={faPlay} />
-              Continue
-            </button>
-          ) : selectedRepo ? (
-            <button
-              onClick={toggleFileSelector}
-              className="mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-700"
-            >
-              <FontAwesomeIcon icon={faHandPointer} />
-              Select files
-            </button>
-          ) : agentResponse.step === 7 ? (
-            <button
-              onClick={handleFinalStep}
-              className="mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg bg-green-500 text-white"
-            >
-              <FontAwesomeIcon icon={faPlay} />
-              Continue
-            </button>
-          ) : (
-            <button
-              onClick={handleInputSubmit}
-              disabled={!selectedRepo}
-              className={`mt-2 px-4 flex w-56 items-center gap-2 py-2 rounded-lg ${
-                selectedRepo
-                  ? "bg-green-500 text-white hover:bg-green-700 standard-button"
-                  : "bg-gray-400 text-gray-200 cursor-not-allowed"
-              }`}
-            >
-              <FontAwesomeIcon icon={faPlay} />
-              {agentResponse.step >= 1 && agentResponse.step < 7
-                ? "Continue"
-                : "Start Integration"}
-            </button>
-          )}
         </div>
         <div className="border-2 bg-gray-100 border-black rounded-lg p-0 w-full h-3/4 overflow-auto">
           {isLoading ? (
             <div>
               <OurProcess
-               isRepoSelected={!!selectedRepo}
-               currentStep={agentResponse.step}
-               filesSelected={selectedFilesInParent.length > 0}
-               finalStep={finalStep}
+                isRepoSelected={!!selectedRepo}
+                currentStep={agentResponse.step}
+                filesSelected={selectedFilesInParent.length > 0}
+                finalStep={finalStep}
               />
               <div className="flex justify-center flex-col py-8 items-center h-full">
                 <div className="loader"></div>
@@ -479,9 +463,22 @@ const Processing = () => {
                             Make sure you have your API Key and have placed it
                             in your environment variables!
                           </p>
-                          <pre className="preStyle m-4 p-4">
-                            {agentResponse.content}
-                          </pre>
+                          <div className="m-4 p-4">
+                            {agentResponse.content && (
+                              <ul className="border-2 p-2 bg-white rounded-lg">
+                                {processContentToListItems(
+                                  agentResponse.content
+                                ).map((item, index) => (
+                                  <li
+                                    className="border-b p-2 rounded-lg"
+                                    key={index}
+                                  >
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
                         </div>
                       );
                     case 6:
